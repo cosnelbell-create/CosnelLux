@@ -1,1 +1,756 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CosnelLux AI v1 - Private Investment Advisor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        lux: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
 
+    <style>
+        body { 
+            background-color: #020617; 
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+        }
+        ::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(245, 158, 11, 0.12);
+            border-radius: 1.25rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-panel:hover {
+            border-color: rgba(245, 158, 11, 0.25);
+            box-shadow: 0 15px 50px rgba(245, 158, 11, 0.05);
+        }
+
+        /* Animation Radar Tactique Améliorée */
+        @keyframes radar-pulse {
+            0% { transform: scale(0.95); opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+        .radar-wave {
+            position: absolute;
+            inset: -20px;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            border-radius: 50%;
+            animation: radar-pulse 2s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+        }
+        .radar-wave-delayed {
+            animation-delay: 0.8s;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-lux-500/30 selection:text-white">
+
+    <header class="w-full p-6 flex justify-between items-center z-20 relative border-b border-slate-900/80 bg-slate-950/20 backdrop-blur-md">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-lux-400 via-lux-500 to-lux-600 flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.35)]">
+                <i class="fa-solid fa-crown text-slate-950 text-xl"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-2xl font-bold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-lux-400 via-amber-200 to-white">COSNELUX</h1>
+                    <span class="text-[9px] font-bold bg-lux-500/10 text-lux-400 px-1.5 py-0.5 rounded border border-lux-500/20 tracking-wider">V1 PROD</span>
+                </div>
+                <p class="text-[10px] text-slate-400 tracking-[0.3em] uppercase mt-0.5">Private Investment Advisor</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-3 text-xs" id="api-status-indicator">
+                <div id="api-fallback-badge" class="hidden px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-lux-400 border border-lux-500/20 animate-pulse">Mode Routage IA Actif</div>
+                <div class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.6)]" id="api-led"></div>
+                <span class="text-slate-400 hidden sm:inline-block font-medium tracking-wide" id="api-status-text">Système Déconnecté</span>
+            </div>
+            <button onclick="UiModule.openSettings()" class="w-10 h-10 rounded-full bg-slate-900/80 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-lux-400 hover:border-lux-500/40 transition-all duration-300 transform hover:rotate-45">
+                <i class="fa-solid fa-sliders text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center px-4 w-full max-w-7xl mx-auto z-10 mt-12 transition-all duration-500" id="main-container">
+        
+        <div class="w-full max-w-3xl mb-12 text-center" id="search-section">
+            <h2 class="text-3xl font-light mb-8 text-slate-200 tracking-wide">Orchestrateur d'Actifs & Analyses Privées</h2>
+            <div class="relative flex items-center w-full group">
+                <i class="fa-solid fa-fingerprint absolute left-6 text-lux-500 text-xl group-focus-within:text-lux-400 transition-colors"></i>
+                <input type="text" id="asset-input" placeholder="Saisir un symbole ou libellé (Ex: BTC, Gold, EUR/USD, Pi Network...)" 
+                       class="w-full bg-slate-900/40 border border-slate-800 text-white rounded-2xl py-5 pl-16 pr-36 focus:outline-none focus:border-lux-500 focus:ring-2 focus:ring-lux-500/10 transition-all text-base tracking-wide shadow-2xl placeholder-slate-500"
+                       onkeypress="if(event.key === 'Enter') AnalysisModule.start()">
+                <button onclick="AnalysisModule.start()" class="absolute right-3 top-3 bottom-3 bg-gradient-to-r from-lux-500 to-lux-600 hover:from-lux-400 hover:to-lux-500 text-slate-950 font-semibold px-8 rounded-xl transition-all shadow-[0_4px_15px_rgba(245,158,11,0.2)] hover:shadow-[0_4px_25px_rgba(245,158,11,0.4)] tracking-wider text-sm">
+                    ANALYSER
+                </button>
+            </div>
+        </div>
+
+        <div id="loading-screen" class="hidden flex-col items-center justify-center my-16 relative">
+            <div class="w-20 h-20 rounded-full border-2 border-slate-800 border-t-lux-500 animate-spin flex items-center justify-center mb-8 relative">
+                <div class="radar-wave"></div>
+                <div class="radar-wave radar-wave-delayed"></div>
+                <i class="fa-solid fa-shield-halved text-lux-500 text-xl animate-pulse"></i>
+            </div>
+            <p id="loading-text" class="text-lux-400 tracking-[0.2em] uppercase text-xs font-semibold mb-2">Initialisation...</p>
+            <p id="loading-subtext" class="text-slate-500 text-xs tracking-wide">Connexion sécurisée aux protocoles de flux</p>
+        </div>
+
+        <div id="results-grid" class="hidden w-full grid grid-cols-1 lg:grid-cols-2 gap-6 pb-16">
+            
+            <div class="glass-panel p-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                <div class="absolute -right-6 -top-6 opacity-5">
+                    <i class="fa-solid fa-gavel text-9xl text-lux-500"></i>
+                </div>
+                <h3 class="text-slate-400 text-xs font-bold tracking-widest uppercase mb-6 w-full text-left flex items-center gap-2">
+                    <i class="fa-solid fa-circle-nodes text-lux-500"></i> Position Stratégique Impérative
+                </h3>
+                <div id="verdict-badge" class="px-10 py-4 rounded-2xl text-3xl font-black tracking-widest mb-6 border shadow-2xl transition-all duration-500">
+                    --
+                </div>
+                <div class="w-full max-w-sm">
+                    <div class="flex justify-between text-xs text-slate-400 mb-2 font-medium">
+                        <span>Indice d'Assurance Algorithmique</span>
+                        <span id="confidence-val" class="text-lux-400 font-bold">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-950 rounded-full h-2.5 p-0.5 border border-slate-800">
+                        <div id="confidence-bar" class="bg-gradient-to-r from-lux-600 via-lux-500 to-amber-300 h-1.5 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-8 flex flex-col relative">
+                <h3 class="text-slate-400 text-xs font-bold tracking-widest uppercase mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-line text-lux-500"></i> Métriques de Synthèse & Intelligence Marché
+                </h3>
+                <div class="flex items-baseline gap-3 mb-4 border-b border-slate-800/60 pb-4">
+                    <span class="text-4xl font-extralight text-white tracking-tight" id="current-price">--</span>
+                    <span class="text-[10px] bg-slate-900 border border-slate-800 px-2 py-0.5 rounded text-slate-400 uppercase tracking-widest" id="price-source-badge">Indexé</span>
+                </div>
+                <p id="technical-analysis" class="text-slate-300 text-sm leading-relaxed overflow-y-auto flex-grow pr-2 font-light">
+                    --
+                </p>
+            </div>
+
+            <div class="glass-panel p-8">
+                <h3 class="text-slate-400 text-xs font-bold tracking-widest uppercase mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-lux-500"></i> Matrice Opérationnelle Tactique
+                </h3>
+                <div class="space-y-4">
+                    <div class="bg-slate-950/60 p-4 rounded-xl border border-emerald-500/10">
+                        <h4 class="text-emerald-400 text-xs font-bold uppercase mb-2.5 flex items-center gap-2"><i class="fa-solid fa-circle-check"></i> MUST DO (Priorités Absolues)</h4>
+                        <ul id="list-must" class="text-xs text-slate-300 list-disc pl-5 space-y-1.5 font-light"></ul>
+                    </div>
+                    <div class="bg-slate-950/60 p-4 rounded-xl border border-lux-500/10">
+                        <h4 class="text-lux-400 text-xs font-bold uppercase mb-2.5 flex items-center gap-2"><i class="fa-solid fa-bolt"></i> CAN DO (Options & Opportunités)</h4>
+                        <ul id="list-can" class="text-xs text-slate-300 list-disc pl-5 space-y-1.5 font-light"></ul>
+                    </div>
+                    <div class="bg-slate-950/60 p-4 rounded-xl border border-rose-500/10">
+                        <h4 class="text-rose-400 text-xs font-bold uppercase mb-2.5 flex items-center gap-2"><i class="fa-solid fa-hand"></i> STOP DOING (Inhibiteurs de Risque)</h4>
+                        <ul id="list-stop" class="text-xs text-slate-300 list-disc pl-5 space-y-1.5 font-light"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-8 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-slate-400 text-xs font-bold tracking-widest uppercase mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-map-location-dot text-lux-500"></i> Paliers Critiques d'Intervention
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5">
+                            <div class="flex flex-col">
+                                <span class="text-emerald-400 text-xs font-bold uppercase tracking-wider">Take Profit (TP)</span>
+                                <span class="text-[10px] text-slate-400">Objectif de débouclage</span>
+                            </div>
+                            <span id="price-tp" class="text-base font-mono font-bold text-emerald-300">--</span>
+                        </div>
+                        <div class="flex items-center justify-between p-4 rounded-xl border border-slate-700 bg-slate-900/30">
+                            <div class="flex flex-col">
+                                <span class="text-slate-200 text-xs font-bold uppercase tracking-wider">Point d'Entrée Idéal</span>
+                                <span class="text-[10px] text-slate-400">Zone d'efficience technique</span>
+                            </div>
+                            <span id="price-entry" class="text-base font-mono font-bold text-white">--</span>
+                        </div>
+                        <div class="flex items-center justify-between p-4 rounded-xl border border-rose-500/20 bg-rose-500/5">
+                            <div class="flex flex-col">
+                                <span class="text-rose-400 text-xs font-bold uppercase tracking-wider">Stop Loss (SL)</span>
+                                <span class="text-[10px] text-slate-400">Invalidation stricte du scénario</span>
+                            </div>
+                            <span id="price-sl" class="text-base font-mono font-bold text-rose-300">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="grounding-sources-container" class="hidden mt-6 pt-4 border-t border-slate-800/60">
+                    <h4 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                        <i class="fa-solid fa-globe text-sky-400"></i> Sources Google Search Grounding utilisées
+                    </h4>
+                    <div id="grounding-links" class="flex flex-wrap gap-2 text-[11px]"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden opacity-0 transition-all duration-300">
+        <div class="glass-panel w-full max-w-md p-8 transform scale-95 transition-all duration-300" id="settings-panel">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold text-lux-400 uppercase tracking-widest flex items-center gap-2">
+                    <i class="fa-solid fa-vault"></i> Console d'Authentification
+                </h2>
+                <button onclick="UiModule.closeSettings()" class="text-slate-500 hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <div id="auth-step" class="space-y-4">
+                <p class="text-xs text-slate-400 leading-relaxed">Entrez le jeton administrateur pour configurer vos accès de marché souverains.</p>
+                <input type="password" id="admin-pwd" placeholder="Clé d'accès Cosnel" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-white focus:border-lux-500 focus:outline-none text-sm transition-all tracking-widest">
+                <button onclick="StorageModule.verifyPassword()" class="w-full bg-slate-900 hover:bg-slate-800 text-lux-400 font-bold py-3.5 rounded-xl transition-all border border-slate-800 uppercase tracking-widest text-xs">Déverrouiller</button>
+                <p id="auth-error" class="text-rose-500 text-xs hidden text-center font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i> Signature d'accès non valide.</p>
+            </div>
+
+            <div id="keys-step" class="space-y-5 hidden">
+                <div>
+                    <label class="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold tracking-widest">Clé API Google Gemini (Requis)</label>
+                    <input type="password" id="key-gemini" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:border-lux-500 focus:outline-none text-xs font-mono tracking-widest">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold tracking-widest">Clé API Alpha Vantage (Forex/Or)</label>
+                    <input type="password" id="key-alpha" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:border-lux-500 focus:outline-none text-xs font-mono tracking-widest">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 mb-1.5 uppercase font-bold tracking-widest">Clé API CoinGecko Demo (Cryptos)</label>
+                    <input type="password" id="key-coingecko" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:border-lux-500 focus:outline-none text-xs font-mono tracking-widest">
+                </div>
+                <button onclick="StorageModule.saveKeys()" class="w-full bg-gradient-to-r from-lux-500 to-lux-600 text-slate-950 font-bold py-3.5 rounded-xl hover:shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all uppercase tracking-widest text-xs">
+                    Inscrire les secrets locaux
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="alert-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden">
+        <div class="glass-panel w-full max-w-sm p-6 text-center border-rose-500/30">
+            <div class="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-500 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2 tracking-wide">Infrastructure Incomplète</h3>
+            <p class="text-xs text-slate-400 mb-6 leading-relaxed">La clé souveraine Gemini est requise afin d'instancier les modèles prédictifs et le routage des données.</p>
+            <button onclick="UiModule.closeAlertAndOpenSettings()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-6 rounded-xl border border-slate-800 transition-colors text-xs uppercase tracking-wider">
+                Ouvrir les configurations
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // MODULE /STORAGE : Gestion de la persistance locale
+        // ==========================================
+        const StorageModule = {
+            MASTER_PASSWORD: "Cosnel2026",
+            keys: { gemini: '', alpha: '', coingecko: '' },
+
+            init() {
+                this.keys.gemini = localStorage.getItem('cosnel_gemini') || '';
+                this.keys.alpha = localStorage.getItem('cosnel_alpha') || '';
+                this.keys.coingecko = localStorage.getItem('cosnel_coingecko') || '';
+                UiModule.updateApiLed();
+            },
+
+            verifyPassword() {
+                const pwd = document.getElementById('admin-pwd').value;
+                if (pwd === this.MASTER_PASSWORD) {
+                    document.getElementById('auth-step').classList.add('hidden');
+                    document.getElementById('keys-step').classList.remove('hidden');
+                    document.getElementById('key-gemini').value = this.keys.gemini;
+                    document.getElementById('key-alpha').value = this.keys.alpha;
+                    document.getElementById('key-coingecko').value = this.keys.coingecko;
+                } else {
+                    const err = document.getElementById('auth-error');
+                    err.classList.remove('hidden');
+                    setTimeout(() => err.classList.add('hidden'), 3000);
+                }
+            },
+
+            saveKeys() {
+                this.keys.gemini = document.getElementById('key-gemini').value.trim();
+                this.keys.alpha = document.getElementById('key-alpha').value.trim();
+                this.keys.coingecko = document.getElementById('key-coingecko').value.trim();
+
+                localStorage.setItem('cosnel_gemini', this.keys.gemini);
+                localStorage.setItem('cosnel_alpha', this.keys.alpha);
+                localStorage.setItem('cosnel_coingecko', this.keys.coingecko);
+
+                UiModule.updateApiLed();
+                UiModule.closeSettings();
+            }
+        };
+
+        // ==========================================
+        // MODULE /UTILS : Algorithmes et Parsing résilients
+        // ==========================================
+        const UtilsModule = {
+            // Détecteur polymorphique avancé
+            detectAssetClass(asset) {
+                const clean = asset.trim().toUpperCase();
+                
+                // Base Crypto Etendue par Regex
+                const cryptoTickers = ['BTC', 'ETH', 'SOL', 'XRP', 'ADA', 'DOGE', 'TON', 'AVAX', 'LINK', 'ARB', 'APT', 'SEI', 'SUI', 'BNB', 'TRX', 'DOT', 'NEAR', 'MATIC'];
+                const isCryptoPattern = cryptoTickers.some(ticker => clean === ticker || clean.startsWith(ticker + ' ') || clean.endsWith(' ' + ticker));
+                
+                // Base Forex par Regex
+                const isForexPattern = /^[A-Z]{3}\/[A-Z]{3}$|^[A-Z]{6}$/.test(clean) || ['EUR', 'USD', 'GBP', 'JPY', 'CHF', 'AUD', 'CAD'].some(fx => clean.includes(fx) && clean.includes('/'));
+
+                // Base Métaux précieux
+                const isMetalPattern = ['XAU', 'GOLD', 'OR', 'XAG', 'SILVER', 'ARGENT', 'PLATINUM', 'PALLADIUM'].some(m => clean.includes(m));
+
+                if (isCryptoPattern) return { type: 'CRYPTO', symbol: clean };
+                if (isMetalPattern) return { type: 'METAL', symbol: clean };
+                if (isForexPattern) return { type: 'FOREX', symbol: clean };
+                
+                return { type: 'UNKNOWN', symbol: clean };
+            },
+
+            // Extracteur et Nettoyeur Ultra-Robuste de JSON
+            cleanAndParseJSON(rawText) {
+                try {
+                    let cleaned = rawText.trim();
+                    // Élimination des délimitations markdown courantes
+                    cleaned = cleaned.replace(/^```json/gi, '').replace(/^```/gi, '').replace(/```$/g, '').trim();
+                    
+                    const firstBrace = cleaned.indexOf('{');
+                    const lastBrace = cleaned.lastIndexOf('}');
+                    
+                    if (firstBrace !== -1 && lastBrace !== -1) {
+                        cleaned = cleaned.substring(firstBrace, lastBrace + 1);
+                    }
+                    return JSON.parse(cleaned);
+                } catch (error) {
+                    console.error("Format JSON brut corrompu par l'IA:", rawText);
+                    throw new Error("L'intelligence distribuée a renvoyé une structure non conforme au parseur.");
+                }
+            },
+
+            // Dictionnaire ID CoinGecko pour tickers clés
+            mapCryptoId(symbol) {
+                const mappings = {
+                    'BTC': 'bitcoin', 'ETH': 'ethereum', 'SOL': 'solana', 'XRP': 'ripple',
+                    'ADA': 'cardano', 'DOGE': 'dogecoin', 'TON': 'the-open-network',
+                    'AVAX': 'avalanche-2', 'LINK': 'chainlink', 'ARB': 'arbitrum',
+                    'APT': 'aptos', 'SEI': 'sei-network', 'SUI': 'sui', 'BNB': 'binancecoin', 'TRX': 'tron'
+                };
+                return mappings[symbol] || symbol.toLowerCase();
+            },
+
+            // Normalisation des symboles pour Alpha Vantage
+            mapAlphaSymbol(symbol, type) {
+                if (type === 'METAL') {
+                    if (symbol.includes('OR') || symbol.includes('GOLD') || symbol.includes('XAU')) return 'XAUUSD';
+                    if (symbol.includes('ARGENT') || symbol.includes('SILVER') || symbol.includes('XAG')) return 'XAGUSD';
+                }
+                return symbol.replace('/', '').toUpperCase();
+            }
+        };
+
+        // ==========================================
+        // MODULE /API : Protocoles réseau (CoinGecko & Alpha Vantage)
+        // ==========================================
+        const ApiModule = {
+            async fetchCrypto(symbol) {
+                if (!StorageModule.keys.coingecko) throw new Error("Clé CoinGecko absente");
+                const coinId = UtilsModule.mapCryptoId(symbol);
+                const url = `https://api.coingecko.com/api/v3/coins/${coinId}?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=false`;
+                
+                const response = await fetch(url, {
+                    headers: { 'x-cg-demo-api-key': StorageModule.keys.coingecko }
+                });
+                if (!response.ok) throw new Error(`Status CoinGecko: ${response.status}`);
+                
+                const data = await response.json();
+                const market = data.market_data;
+                return {
+                    source: "CoinGecko V3 Complet",
+                    prix: `$${market.current_price.usd}`,
+                    var_24h: `${market.price_change_percentage_24h.toFixed(2)}%`,
+                    volume_24h: `$${market.total_volume.usd.toLocaleString()}`,
+                    market_cap: `$${market.market_cap.usd.toLocaleString()}`,
+                    rank: `#${data.market_cap_rank}`,
+                    supply: `${market.circulating_supply.toLocaleString()} ${data.symbol.toUpperCase()}`
+                };
+            },
+
+            async fetchMarketData(symbol, type) {
+                if (!StorageModule.keys.alpha) throw new Error("Clé Alpha Vantage absente");
+                const cleanSymbol = UtilsModule.mapAlphaSymbol(symbol, type);
+                
+                // Appel Temps Réel GLOBAL_QUOTE
+                const quoteUrl = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${cleanSymbol}&apikey=${StorageModule.keys.alpha}`;
+                const quoteResponse = await fetch(quoteUrl);
+                if (!quoteResponse.ok) throw new Error("Erreur réseau Alpha Vantage Quote");
+                const quoteData = await quoteResponse.json();
+                const quote = quoteData["Global Quote"];
+
+                if (!quote || !quote["05. price"]) {
+                    throw new Error("Symbole introuvable ou quota atteint sur Alpha Vantage");
+                }
+
+                let marketContext = {
+                    source: "Alpha Vantage High-Frequency",
+                    prix: quote["05. price"],
+                    var_24h: quote["10. change percent"],
+                    volume_24h: quote["06. volume"] || "N/A",
+                    tendance: parseFloat(quote["09. change"]) >= 0 ? "HAUSSIÈRE" : "BAISSIÈRE",
+                    context_journalier: `Haut: ${quote["03. high"]} | Bas: ${quote["04. low"]}`
+                };
+
+                // Enrichissement optionnel via FX_DAILY pour le Forex
+                if (type === 'FOREX') {
+                    try {
+                        const fromCurrency = cleanSymbol.substring(0,3);
+                        const toCurrency = cleanSymbol.substring(3,6);
+                        const fxUrl = `https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=${fromCurrency}&to_symbol=${toCurrency}&apikey=${StorageModule.keys.alpha}`;
+                        const fxRes = await fetch(fxUrl);
+                        if (fxRes.ok) {
+                            const fxData = await fxRes.json();
+                            if (fxData["Time Series FX (Daily)"]) {
+                                const dates = Object.keys(fxData["Time Series FX (Daily)"]);
+                                if (dates.length > 0) {
+                                    marketContext.context_journalier += ` | Clôture veille: ${fxData["Time Series FX (Daily)"][dates[0]]["4. close"]}`;
+                                }
+                            }
+                        }
+                    } catch (e) { console.warn("Enrichissement FX_DAILY ignoré", e); }
+                }
+
+                return marketContext;
+            }
+        };
+
+        // ==========================================
+        // MODULE /ANALYSIS : Moteur d'Analyse IA Gemini
+        // ==========================================
+        const AnalysisModule = {
+            async start() {
+                const input = document.getElementById('asset-input').value.trim();
+                if (!input) return;
+
+                if (!StorageModule.keys.gemini) {
+                    UiModule.openAlert();
+                    return;
+                }
+
+                UiModule.toggleLoading(true);
+                UiModule.setLoadingText("Analyse de la typologie d'actif...", "Routage vers les serveurs de détection algorithmique");
+                UiModule.toggleFallbackBadge(false);
+
+                const assetInfo = UtilsModule.detectAssetClass(input);
+                let marketData = null;
+                let apiFailed = false;
+
+                // ETAPE 1: Tentative de récupération via API dures
+                if (assetInfo.type === 'CRYPTO') {
+                    try {
+                        UiModule.setLoadingText("Extraction des registres CoinGecko API...", "Récupération des volumes, capitalisations et supply");
+                        marketData = await ApiModule.fetchCrypto(assetInfo.symbol);
+                    } catch (e) {
+                        console.warn("Échec CoinGecko, déclenchement du protocole de résilience", e);
+                        apiFailed = true;
+                    }
+                } else if (assetInfo.type === 'FOREX' || assetInfo.type === 'METAL') {
+                    try {
+                        UiModule.setLoadingText("Interconnexion Alpha Vantage Real-Time...", "Calcul des spreads et agrégations des tendances");
+                        marketData = await ApiModule.fetchMarketData(assetInfo.symbol, assetInfo.type);
+                    } catch (e) {
+                        console.warn("Échec Alpha Vantage, déclenchement du protocole de résilience", e);
+                        apiFailed = true;
+                    }
+                } else {
+                    // Actif Atypique détecté d'office (Pi Network, etc.)
+                    apiFailed = true;
+                }
+
+                // ETAPE 2 & 3: Gestion du Système de Fallback / Fusion de données
+                if (apiFailed || !marketData) {
+                    UiModule.toggleFallbackBadge(true);
+                    UiModule.setLoadingText("Activation du Fallback Souverain...", "Routage exclusif vers Gemini Search Grounding en temps réel");
+                    marketData = {
+                        source: "Gemini Google Search Grounding Intégral",
+                        note: "Les API dures ont échoué ou l'actif est atypique. Données extraites en direct des flux macroéconomiques globaux."
+                    };
+                }
+
+                // ETAPE 4: Appel au Moteur Gemini avec Extended Thinking Natif
+                try {
+                    UiModule.setLoadingText("Instanciation de Gemini (Thinking Mode Négocié)...", "Raisonnement logique en cours sur les marchés mondiaux");
+                    const aiResult = await this.callGemini(input, marketData);
+                    UiModule.render(aiResult);
+                } catch (error) {
+                    console.error("Échec critique du moteur IA:", error);
+                    alert("Erreur critique de calcul de l'IA : " + error.message);
+                    UiModule.resetView();
+                } finally {
+                    UiModule.toggleLoading(false);
+                }
+            },
+
+            async callGemini(asset, contextData) {
+                // Modèle mis à jour vers les standards optimisés supportant nativement l'Extended Thinking
+                const targetModel = "gemini-2.0-flash";
+                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${StorageModule.keys.gemini}`;
+
+                const systemInstruction = `Tu es CosnelLux AI, un conseiller financier privé d'élite de niveau Wall Street, travaillant exclusivement pour l'investisseur privé Cosnel. Tu es pragmatique, analytique et d'une franchise absolue. Tu n'utilises jamais de jargon flou ni de phrases d'évitement sur les risques. Tu prends des décisions tranchées.
+Tu analyses les données techniques fournies et les croises avec tes recherches web instantanées issues de ton outil de recherche Google (sentiments du marché, actualités macro, régulations).
+
+Tu renverras STRICTEMENT ta réponse finale sous la forme d'un objet JSON brut et valide, sans aucun enrobage markdown.
+Structure JSON exigée :
+{
+  "verdict": "ACHAT" ou "VENTE" ou "CONSERVER",
+  "confiance": 90,
+  "prix_analyse": "Chaîne du prix analysé",
+  "analyse_technique": "Synthèse condensée macro, RSI, MM et actualités chaudes",
+  "must_do": ["Action impérative 1", "Action impérative 2"],
+  "can_do": ["Opportunité optionnelle 1"],
+  "stop_doing": ["Erreur à éviter impérativement"],
+  "entree": "Seuil d'entrée",
+  "take_profit": "Objectif de sortie haute",
+  "stop_loss": "Invalidation"
+}`;
+
+                const prompt = `Analyse stratégique requise pour l'investisseur Cosnel. Actif cible : ${asset}.
+Contexte technique extrait des API sous-jacentes : ${JSON.stringify(contextData)}.
+Exécute tes requêtes de recherche web en temps réel si des données manquent ou pour corroborer la macroéconomie actuelle.`;
+
+                // Payload intégrant la syntaxe officielle et native du mode Extended Thinking (thinkingConfig)
+                // ainsi que le Google Search Tool pour le Grounding en temps réel.
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    systemInstruction: { parts: [{ text: systemInstruction }] },
+                    tools: [{ googleSearch: {} }],
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        thinkingConfig: {
+                            thinkingBudget: 2048 // Budget de réflexion élevé alloué nativement
+                        },
+                        temperature: 0.1
+                    }
+                };
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errJson = await response.json();
+                    throw new Error(errJson.error?.message || "Incident réseau API Gemini");
+                }
+
+                const responseData = await response.json();
+                
+                // Récupération et extraction des sources de Grounding (Google Search Sources)
+                let sources = [];
+                try {
+                    const candidate = responseData.candidates?.[0];
+                    if (candidate?.groundingMetadata?.groundingChunks) {
+                        sources = candidate.groundingMetadata.groundingChunks
+                            .filter(chunk => chunk.web?.uri)
+                            .map(chunk => ({ title: chunk.web.title, url: chunk.web.uri }));
+                    }
+                } catch(e) { console.warn("Impossible d'extraire les métadonnées de grounding", e); }
+
+                const rawText = responseData.candidates[0].content.parts[0].text;
+                const parsedJson = UtilsModule.cleanAndParseJSON(rawText);
+                
+                // Injection dynamique des sources récoltées pour traitement UI
+                parsedJson._sources = sources;
+                return parsedJson;
+            }
+        };
+
+        // ==========================================
+        // MODULE /UI : Gestion de l'affichage de l'interface premium
+        // ==========================================
+        const UiModule = {
+            openSettings() {
+                const modal = document.getElementById('settings-modal');
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.remove('opacity-0'), 10);
+                document.getElementById('auth-step').classList.remove('hidden');
+                document.getElementById('keys-step').classList.add('hidden');
+                document.getElementById('admin-pwd').value = '';
+            },
+
+            closeSettings() {
+                const modal = document.getElementById('settings-modal');
+                modal.classList.add('opacity-0');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            },
+
+            openAlert() {
+                document.getElementById('alert-modal').classList.remove('hidden');
+            },
+
+            closeAlertAndOpenSettings() {
+                document.getElementById('alert-modal').classList.add('hidden');
+                this.openSettings();
+            },
+
+            toggleLoading(show) {
+                const screen = document.getElementById('loading-screen');
+                const grid = document.getElementById('results-grid');
+                if (show) {
+                    screen.classList.remove('hidden');
+                    screen.classList.add('flex');
+                    grid.classList.add('hidden');
+                } else {
+                    screen.classList.add('hidden');
+                    screen.classList.remove('flex');
+                }
+            },
+
+            setLoadingText(main, sub) {
+                document.getElementById('loading-text').textContent = main;
+                document.getElementById('loading-subtext').textContent = sub;
+            },
+
+            toggleFallbackBadge(show) {
+                const badge = document.getElementById('api-fallback-badge');
+                if (show) badge.classList.remove('hidden');
+                else badge.classList.add('hidden');
+            },
+
+            updateApiLed() {
+                const led = document.getElementById('api-led');
+                const text = document.getElementById('api-status-text');
+                if (StorageModule.keys.gemini) {
+                    led.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.7)]";
+                    text.textContent = "Système Sécurisé";
+                    text.className = "text-emerald-400 hidden sm:inline-block font-medium tracking-wide";
+                } else {
+                    led.className = "w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.7)]";
+                    text.textContent = "Configuration Requise";
+                    text.className = "text-rose-400 hidden sm:inline-block font-medium tracking-wide";
+                }
+            },
+
+            resetView() {
+                document.getElementById('search-section').classList.remove('hidden');
+                document.getElementById('results-grid').classList.add('hidden');
+                document.querySelector('#search-section h2').classList.remove('hidden');
+                document.getElementById('search-section').classList.remove('scale-90', 'transform', 'origin-top', 'mb-8');
+                document.getElementById('search-section').classList.add('mb-12');
+            },
+
+            render(data) {
+                const grid = document.getElementById('results-grid');
+                grid.classList.remove('hidden');
+
+                // 1. Position / Verdict Visuel Élite
+                const badge = document.getElementById('verdict-badge');
+                badge.textContent = data.verdict;
+                badge.className = "px-10 py-4 rounded-2xl text-3xl font-black tracking-widest mb-6 border shadow-2xl transition-all duration-500 ";
+                
+                if (data.verdict === "ACHAT") {
+                    badge.className += "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-[0_0_30px_rgba(16,185,129,0.25)]";
+                } else if (data.verdict === "VENTE") {
+                    badge.className += "bg-rose-500/10 text-rose-400 border-rose-500/30 shadow-[0_0_30px_rgba(244,63,94,0.25)]";
+                } else {
+                    badge.className += "bg-lux-500/10 text-lux-400 border-lux-500/30 shadow-[0_0_30px_rgba(245,158,11,0.25)]";
+                }
+
+                // Jauge algorithmique
+                document.getElementById('confidence-val').textContent = `${data.confiance}%`;
+                setTimeout(() => {
+                    document.getElementById('confidence-bar').style.width = `${data.confiance}%`;
+                }, 100);
+
+                // 2. Prix et synthèse textuelle
+                document.getElementById('current-price').textContent = data.prix_analyse;
+                document.getElementById('technical-analysis').textContent = data.analyse_technique;
+                
+                const sourceBadge = document.getElementById('price-source-badge');
+                sourceBadge.textContent = document.getElementById('api-fallback-badge').classList.contains('hidden') ? "Données API Fondamentales" : "Vérification Grounding Web";
+
+                // 3. Matrice d'action
+                this.fillList('list-must', data.must_do);
+                this.fillList('list-can', data.can_do);
+                this.fillList('list-stop', data.stop_doing);
+
+                // 4. Cartographie des prix stratégiques
+                document.getElementById('price-entry').textContent = data.entree;
+                document.getElementById('price-tp').textContent = data.take_profit;
+                document.getElementById('price-sl').textContent = data.stop_loss;
+
+                // 5. Affichage dynamique des Sources Grounding (Google Search References)
+                const sourcesContainer = document.getElementById('grounding-sources-container');
+                const linksWrapper = document.getElementById('grounding-links');
+                linksWrapper.innerHTML = '';
+                
+                if (data._sources && data._sources.length > 0) {
+                    sourcesContainer.classList.remove('hidden');
+                    data._sources.forEach(src => {
+                        const a = document.createElement('a');
+                        a.href = src.url;
+                        a.target = "_blank";
+                        a.className = "bg-slate-900 hover:bg-slate-800 text-sky-400 border border-slate-800 px-2 py-1 rounded flex items-center gap-1 transition-all max-w-xs truncate";
+                        a.innerHTML = `<i class="fa-solid fa-link text-[9px] text-slate-500"></i> ${src.title || 'Source Référence'}`;
+                        linksWrapper.appendChild(a);
+                    });
+                } else {
+                    sourcesContainer.classList.add('hidden');
+                }
+
+                // Ajustement ergonomique du module de recherche haut
+                const searchSec = document.getElementById('search-section');
+                searchSec.classList.remove('mb-12');
+                searchSec.classList.add('mb-8', 'scale-90', 'transform', 'origin-top');
+                document.querySelector('#search-section h2').classList.add('hidden');
+            },
+
+            fillList(id, array) {
+                const ul = document.getElementById(id);
+                ul.innerHTML = '';
+                if (Array.isArray(array)) {
+                    array.forEach(text => {
+                        const li = document.createElement('li');
+                        li.textContent = text;
+                        ul.appendChild(li);
+                    });
+                }
+            }
+        };
+
+        // Instanciation de l'application à chaud
+        document.addEventListener('DOMContentLoaded', () => StorageModule.init());
+    </script>
+</body>
+</html>
