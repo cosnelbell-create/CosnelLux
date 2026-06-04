@@ -523,7 +523,7 @@
 
             async callGemini(asset, contextData) {
                 // Modèle mis à jour vers les standards optimisés supportant nativement l'Extended Thinking
-                const targetModel = "gemini-2.0-flash";
+                const targetModel = "gemini-1.5-flash";
                 const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${StorageModule.keys.gemini}`;
 
                 const systemInstruction = `Tu es CosnelLux AI, un conseiller financier privé d'élite de niveau Wall Street, travaillant exclusivement pour l'investisseur privé Cosnel. Tu es pragmatique, analytique et d'une franchise absolue. Tu n'utilises jamais de jargon flou ni de phrases d'évitement sur les risques. Tu prends des décisions tranchées.
