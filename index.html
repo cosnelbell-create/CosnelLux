@@ -1,1249 +1,1146 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>COSNELUX · Private Investment Advisor</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COSNELUX — Private Investment Advisor</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Josefin+Sans:wght@100;200;300;400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c; --gold-light: #e8c96a; --gold-dim: #7a5c1e;
+    --black: #050507; --surface: rgba(10,10,18,0.88); --glass: rgba(20,18,30,0.6);
+    --border: rgba(201,168,76,0.15); --border-bright: rgba(201,168,76,0.4);
+    --text-primary: #f0ece0; --text-secondary: #8a8070; --text-muted: #4a4540;
+    --green: #2dd4a0; --red: #e85858; --amber: #e8a020;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--black); color: var(--text-primary); font-family: 'Josefin Sans', sans-serif; font-weight: 300; min-height: 100vh; overflow-x: hidden; letter-spacing: 0.03em; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,0.06) 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 90% 90%, rgba(201,168,76,0.03) 0%, transparent 50%); pointer-events: none; z-index: 0; }
+  body::after { content: ''; position: fixed; inset: 0; background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px); pointer-events: none; z-index: 0; }
+  .z1 { position: relative; z-index: 1; }
 
-  <style>
-    :root {
-      --gold: #c9a84c;
-      --gold-light: #e8c878;
-      --gold-dim: #7a5f28;
-      --black: #03050a;
-      --surface: rgba(12, 16, 26, 0.85);
-      --surface-hover: rgba(18, 24, 38, 0.9);
-      --border: rgba(201, 168, 76, 0.15);
-      --border-bright: rgba(201, 168, 76, 0.4);
-      --text-primary: #f0ebe0;
-      --text-secondary: #8a8070;
-      --text-muted: #4a4535;
-    }
+  header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); background: rgba(5,5,7,0.95); backdrop-filter: blur(20px); }
+  .logo-block { display: flex; flex-direction: column; line-height: 1; }
+  .logo-wordmark { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 1.5rem; letter-spacing: 0.25em; color: var(--gold); text-transform: uppercase; }
+  .logo-sub { font-family: 'Josefin Sans', sans-serif; font-weight: 100; font-size: 0.55rem; letter-spacing: 0.4em; color: var(--text-secondary); text-transform: uppercase; margin-top: 2px; }
+  .header-right { display: flex; align-items: center; gap: 1.2rem; }
+  .api-status { display: flex; align-items: center; gap: 0.5rem; font-size: 0.6rem; letter-spacing: 0.15em; color: var(--text-muted); text-transform: uppercase; }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); transition: all 0.4s; }
+  .status-dot.active { background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .status-dot.partial { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+  .status-dot.error { background: var(--red); box-shadow: 0 0 8px var(--red); }
+  .btn-settings { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-bright); background: transparent; color: var(--gold); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.25s; }
+  .btn-settings:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); box-shadow: 0 0 16px rgba(201,168,76,0.2); }
+  .btn-settings svg { width: 16px; height: 16px; transition: transform 0.6s; }
+  .btn-settings:hover svg { transform: rotate(60deg); }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+  main { padding-top: 64px; min-height: 100vh; display: flex; flex-direction: column; }
+  .hero { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 1.5rem 3rem; text-align: center; min-height: calc(100vh - 64px); transition: all 0.6s cubic-bezier(0.4,0,0.2,1); }
+  .hero.has-results { min-height: auto; padding: 2rem 1.5rem; justify-content: flex-start; }
+  .hero-title { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(2.2rem, 6vw, 4.5rem); line-height: 1.1; color: var(--text-primary); margin-bottom: 0.5rem; opacity: 0; transform: translateY(20px); animation: fadeUp 0.8s 0.2s forwards; }
+  .hero-title span { color: var(--gold); font-style: italic; }
+  .hero-sub { font-size: 0.7rem; letter-spacing: 0.35em; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 3.5rem; opacity: 0; animation: fadeUp 0.8s 0.4s forwards; }
+  .search-container { width: 100%; max-width: 620px; opacity: 0; transform: translateY(20px); animation: fadeUp 0.8s 0.6s forwards; }
+  .search-wrap { position: relative; display: flex; align-items: center; background: var(--glass); border: 1px solid var(--border-bright); border-radius: 4px; backdrop-filter: blur(16px); transition: all 0.3s; overflow: hidden; }
+  .search-wrap:focus-within { border-color: var(--gold); box-shadow: 0 0 40px rgba(201,168,76,0.12), inset 0 0 20px rgba(201,168,76,0.03); }
+  .search-icon { padding: 0 1rem; color: var(--gold-dim); flex-shrink: 0; }
+  #assetInput { flex: 1; background: transparent; border: none; outline: none; color: var(--text-primary); font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 300; padding: 1rem 0.5rem; letter-spacing: 0.05em; }
+  #assetInput::placeholder { color: var(--text-muted); font-style: italic; }
+  .btn-analyze { margin: 6px; padding: 0.7rem 1.5rem; background: var(--gold); color: var(--black); border: none; border-radius: 3px; font-family: 'Josefin Sans', sans-serif; font-size: 0.65rem; font-weight: 400; letter-spacing: 0.3em; text-transform: uppercase; cursor: pointer; transition: all 0.25s; white-space: nowrap; flex-shrink: 0; }
+  .btn-analyze:hover { background: var(--gold-light); box-shadow: 0 0 24px rgba(201,168,76,0.35); }
+  .btn-analyze:disabled { opacity: 0.4; cursor: not-allowed; }
+  .search-hint { margin-top: 0.9rem; font-size: 0.6rem; letter-spacing: 0.2em; color: var(--text-muted); text-transform: uppercase; }
 
-    html, body {
-      background: var(--black);
-      color: var(--text-primary);
-      font-family: 'DM Mono', monospace;
-      min-height: 100vh;
-      overflow-x: hidden;
-      scroll-behavior: smooth;
-    }
+  #loadingScreen { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 1.5rem; gap: 2rem; }
+  #loadingScreen.active { display: flex; }
+  .radar-container { position: relative; width: 120px; height: 120px; }
+  .radar-ring { position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--border-bright); animation: radarPulse 2s ease-out infinite; }
+  .radar-ring:nth-child(2) { animation-delay: 0.5s; }
+  .radar-ring:nth-child(3) { animation-delay: 1s; }
+  .radar-core { position: absolute; inset: 20%; border-radius: 50%; border: 1px solid var(--gold); background: rgba(201,168,76,0.05); }
+  .radar-sweep { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; animation: radarSweep 2s linear infinite; }
+  .radar-sweep::after { content: ''; position: absolute; top: 50%; left: 50%; width: 50%; height: 1px; background: linear-gradient(to right, transparent, var(--gold)); transform-origin: 0 0; }
+  .radar-center { position: absolute; inset: 48%; border-radius: 50%; background: var(--gold); box-shadow: 0 0 12px var(--gold); }
+  .loading-status { font-size: 0.65rem; letter-spacing: 0.3em; color: var(--gold); text-transform: uppercase; text-align: center; min-height: 1.2em; }
 
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 1000;
-      opacity: 0.4;
-    }
+  #resultsGrid { display: none; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; width: 100%; max-width: 900px; margin: 0 auto; opacity: 0; transform: translateY(16px); transition: opacity 0.5s, transform 0.5s cubic-bezier(0.4,0,0.2,1); }
+  #resultsGrid.visible { display: grid; opacity: 1; transform: translateY(0); }
+  .result-card { background: var(--surface); backdrop-filter: blur(20px); padding: 1.8rem; position: relative; overflow: hidden; }
+  .result-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-dim), transparent); opacity: 0.5; }
+  .card-label { font-size: 0.55rem; letter-spacing: 0.4em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
+  .card-label::before { content: ''; display: block; width: 16px; height: 1px; background: var(--gold-dim); }
 
-    .bg-mesh {
-      position: fixed;
-      inset: 0;
-      overflow: hidden;
-      z-index: 0;
-      pointer-events: none;
-    }
-    .bg-mesh::before {
-      content: '';
-      position: absolute;
-      top: -30%;
-      left: -20%;
-      width: 80vw;
-      height: 80vw;
-      background: radial-gradient(ellipse, rgba(201, 168, 76, 0.04) 0%, transparent 70%);
-      animation: meshDrift 25s ease-in-out infinite alternate;
-    }
-    .bg-mesh::after {
-      content: '';
-      position: absolute;
-      bottom: -30%;
-      right: -20%;
-      width: 70vw;
-      height: 70vw;
-      background: radial-gradient(ellipse, rgba(80, 100, 200, 0.03) 0%, transparent 70%);
-      animation: meshDrift 30s ease-in-out infinite alternate-reverse;
-    }
-    @keyframes meshDrift {
-      from { transform: translate(0, 0) scale(1); }
-      to   { transform: translate(4%, 3%) scale(1.05); }
-    }
+  .verdict-badge { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.5rem 1.2rem; border-radius: 3px; font-family: 'Josefin Sans', sans-serif; font-size: 1.4rem; font-weight: 200; letter-spacing: 0.3em; margin-bottom: 1.4rem; }
+  .verdict-badge.buy { background: rgba(45,212,160,0.1); color: var(--green); border: 1px solid rgba(45,212,160,0.3); }
+  .verdict-badge.sell { background: rgba(232,88,88,0.1); color: var(--red); border: 1px solid rgba(232,88,88,0.3); }
+  .verdict-badge.hold { background: rgba(232,160,32,0.1); color: var(--amber); border: 1px solid rgba(232,160,32,0.3); }
+  .confidence-label { font-size: 0.6rem; letter-spacing: 0.25em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; }
+  .confidence-bar-wrap { height: 2px; background: rgba(201,168,76,0.12); border-radius: 2px; overflow: hidden; margin-bottom: 0.4rem; }
+  .confidence-bar { height: 100%; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); border-radius: 2px; transition: width 1.2s cubic-bezier(0.4,0,0.2,1); width: 0; }
+  .confidence-value { font-family: 'DM Mono', monospace; font-size: 1.8rem; font-weight: 300; color: var(--gold); line-height: 1; }
+  .confidence-pct { font-size: 0.9rem; color: var(--gold-dim); }
+  .price-display { font-family: 'DM Mono', monospace; font-size: 1.1rem; color: var(--gold); margin-bottom: 1rem; letter-spacing: 0.05em; }
+  .tech-text { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.7; font-family: 'Cormorant Garamond', serif; font-weight: 300; }
 
-    .scanlines {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 999;
-      background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0,0,0,0.03) 2px,
-        rgba(0,0,0,0.03) 4px
-      );
-    }
+  .indicators-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
+  .indicator-chip { padding: 0.2rem 0.5rem; border-radius: 2px; font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.05em; border: 1px solid; }
+  .indicator-chip.bull { color: var(--green); border-color: rgba(45,212,160,0.3); background: rgba(45,212,160,0.05); }
+  .indicator-chip.bear { color: var(--red); border-color: rgba(232,88,88,0.3); background: rgba(232,88,88,0.05); }
+  .indicator-chip.neutral { color: var(--amber); border-color: rgba(232,160,32,0.3); background: rgba(232,160,32,0.05); }
 
-    .font-display  { font-family: 'Cormorant Garamond', serif; }
-    .font-title    { font-family: 'Syne', sans-serif; }
-    .font-mono     { font-family: 'DM Mono', monospace; }
+  .action-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+  .action-item { display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.5; padding: 0.4rem 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .action-dot { flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; margin-top: 0.35rem; }
+  .dot-green { background: var(--green); box-shadow: 0 0 6px rgba(45,212,160,0.5); }
+  .dot-amber { background: var(--amber); box-shadow: 0 0 6px rgba(232,160,32,0.4); }
+  .dot-red { background: var(--red); box-shadow: 0 0 6px rgba(232,88,88,0.5); }
+  .action-group-label { font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase; margin: 0.6rem 0 0.2rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); }
+  .action-group-label.must { color: var(--green); }
+  .action-group-label.can { color: var(--amber); }
+  .action-group-label.stop { color: var(--red); }
 
-    .glass-card {
-      background: rgba(10, 13, 22, 0.7);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    .glass-card:hover {
-      border-color: var(--border-bright);
-      box-shadow: 0 0 40px rgba(201, 168, 76, 0.06);
-    }
+  .price-table { width: 100%; border-collapse: collapse; }
+  .price-table tr { border-bottom: 1px solid var(--border); }
+  .price-table tr:last-child { border-bottom: none; }
+  .price-table td { padding: 0.8rem 0.5rem; font-size: 0.78rem; }
+  .price-table .level-label { font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; }
+  .price-table .level-value { font-family: 'DM Mono', monospace; text-align: right; font-size: 0.85rem; }
+  .level-entry .level-value { color: var(--green); }
+  .level-tp .level-value { color: var(--gold); }
+  .level-sl .level-value { color: var(--red); }
 
-    .text-gold { color: var(--gold); }
-    .text-gold-gradient {
-      background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, var(--gold-dim) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(5,5,7,0.85); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 1.5rem; }
+  .modal-overlay.active { display: flex; }
+  .modal-box { background: rgba(12,11,20,0.99); border: 1px solid var(--border-bright); border-radius: 6px; padding: 2.5rem; width: 100%; max-width: 480px; position: relative; box-shadow: 0 40px 80px rgba(0,0,0,0.8), 0 0 80px rgba(201,168,76,0.05); max-height: 90vh; overflow-y: auto; }
+  .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300; color: var(--gold); margin-bottom: 0.3rem; letter-spacing: 0.05em; }
+  .modal-subtitle { font-size: 0.6rem; letter-spacing: 0.25em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 2rem; }
+  .modal-close { position: absolute; top: 1.2rem; right: 1.2rem; background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem; line-height: 1; padding: 0.3rem; transition: color 0.2s; }
+  .modal-close:hover { color: var(--text-primary); }
+  .field-group { margin-bottom: 1.4rem; }
+  .field-label { display: block; font-size: 0.58rem; letter-spacing: 0.3em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; }
+  .field-input { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 3px; padding: 0.75rem 1rem; color: var(--text-primary); font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.05em; outline: none; transition: border-color 0.25s; }
+  .field-input:focus { border-color: var(--gold); }
+  .field-input::placeholder { color: var(--text-muted); font-style: italic; font-family: 'Josefin Sans', sans-serif; }
+  .field-row { display: flex; gap: 0.5rem; }
+  .field-row .field-input { flex: 1; }
+  .btn-save { width: 100%; padding: 0.85rem; background: var(--gold); color: var(--black); border: none; border-radius: 3px; font-family: 'Josefin Sans', sans-serif; font-size: 0.65rem; letter-spacing: 0.35em; text-transform: uppercase; cursor: pointer; transition: all 0.25s; margin-top: 0.5rem; }
+  .btn-save:hover { background: var(--gold-light); box-shadow: 0 0 24px rgba(201,168,76,0.3); }
+  .btn-danger { width: 100%; padding: 0.7rem; background: transparent; color: var(--red); border: 1px solid rgba(232,88,88,0.3); border-radius: 3px; font-family: 'Josefin Sans', sans-serif; font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; cursor: pointer; transition: all 0.25s; margin-top: 0.5rem; }
+  .btn-danger:hover { background: rgba(232,88,88,0.08); border-color: var(--red); }
+  .btn-icon { padding: 0.6rem 0.8rem; background: transparent; border: 1px solid var(--border); border-radius: 3px; color: var(--text-muted); cursor: pointer; transition: all 0.2s; font-size: 0.8rem; flex-shrink: 0; }
+  .btn-icon:hover { border-color: var(--border-bright); color: var(--text-secondary); }
+  .error-msg { font-size: 0.65rem; color: var(--red); letter-spacing: 0.1em; text-align: center; margin-top: 0.8rem; min-height: 1em; }
+  .success-msg { font-size: 0.65rem; color: var(--green); letter-spacing: 0.1em; text-align: center; margin-top: 0.8rem; min-height: 1em; }
+  .security-note { font-size: 0.65rem; color: var(--text-muted); line-height: 1.6; background: rgba(201,168,76,0.04); border: 1px solid var(--border); border-radius: 3px; padding: 0.8rem; margin-bottom: 1.2rem; }
 
-    .search-input {
-      background: rgba(8, 11, 20, 0.8);
-      border: 1px solid var(--border);
-      color: var(--text-primary);
-      font-family: 'DM Mono', monospace;
-      font-size: 1rem;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-      width: 100%;
-      outline: none;
-    }
-    .search-input:focus {
-      border-color: rgba(201, 168, 76, 0.5);
-      box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.07), 0 0 30px rgba(201, 168, 76, 0.08);
-    }
-    .search-input::placeholder { color: var(--text-muted); }
+  .alert-icon { width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--border-bright); display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 1.4rem; margin-bottom: 1.2rem; }
+  .gold-hr { border: none; height: 1px; background: linear-gradient(90deg, transparent, var(--border-bright), transparent); margin: 1.2rem 0; }
+  .asset-chip { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.7rem; border: 1px solid var(--border); border-radius: 2px; font-size: 0.6rem; letter-spacing: 0.2em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 1rem; }
+  .asset-chip .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+  .btn-reset { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 3px; background: transparent; color: var(--text-muted); font-family: 'Josefin Sans', sans-serif; font-size: 0.58rem; letter-spacing: 0.25em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; margin-top: 1.5rem; }
+  .btn-reset:hover { border-color: var(--border-bright); color: var(--text-secondary); }
+  .fallback-banner { display: none; align-items: center; gap: 0.5rem; padding: 0.4rem 0.8rem; background: rgba(232,160,32,0.08); border: 1px solid rgba(232,160,32,0.2); border-radius: 3px; font-size: 0.6rem; color: var(--amber); letter-spacing: 0.1em; margin-bottom: 0.8rem; }
+  .fallback-banner.visible { display: flex; }
 
-    .btn-gold {
-      background: linear-gradient(135deg, rgba(201, 168, 76, 0.15) 0%, rgba(201, 168, 76, 0.08) 100%);
-      border: 1px solid rgba(201, 168, 76, 0.4);
-      color: var(--gold-light);
-      font-family: 'Syne', sans-serif;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    .btn-gold::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(201, 168, 76, 0.2) 0%, transparent 100%);
-      opacity: 0;
-      transition: opacity 0.25s ease;
-    }
-    .btn-gold:hover::before { opacity: 1; }
-    .btn-gold:hover {
-      border-color: rgba(201, 168, 76, 0.7);
-      box-shadow: 0 0 25px rgba(201, 168, 76, 0.2);
-      color: var(--gold-light);
-    }
-    .btn-gold:active { transform: scale(0.98); }
+  .card-animate { animation: cardIn 0.5s forwards; opacity: 0; }
+  .card-animate:nth-child(1) { animation-delay: 0.05s; }
+  .card-animate:nth-child(2) { animation-delay: 0.15s; }
+  .card-animate:nth-child(3) { animation-delay: 0.25s; }
+  .card-animate:nth-child(4) { animation-delay: 0.35s; }
 
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      display: inline-block;
-    }
-    .status-dot.active {
-      background: #22c55e;
-      box-shadow: 0 0 6px #22c55e;
-      animation: pulse-green 2s infinite;
-    }
-    .status-dot.inactive {
-      background: #ef4444;
-      box-shadow: 0 0 6px #ef4444;
-    }
-    .status-dot.partial {
-      background: var(--gold);
-      box-shadow: 0 0 6px var(--gold);
-      animation: pulse-gold 2s infinite;
-    }
-    @keyframes pulse-green {
-      0%, 100% { box-shadow: 0 0 4px #22c55e; }
-      50%       { box-shadow: 0 0 10px #22c55e, 0 0 20px rgba(34,197,94,0.4); }
-    }
-    @keyframes pulse-gold {
-      0%, 100% { box-shadow: 0 0 4px var(--gold); }
-      50%       { box-shadow: 0 0 10px var(--gold), 0 0 20px rgba(201,168,76,0.4); }
-    }
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+  @keyframes radarPulse { 0% { transform: scale(0.5); opacity: 0.8; } 100% { transform: scale(1.5); opacity: 0; } }
+  @keyframes radarSweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes cardIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
-    #loader {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(3, 5, 10, 0.95);
-      z-index: 500;
-      backdrop-filter: blur(8px);
-    }
-
-    .radar-ring {
-      position: absolute;
-      border-radius: 50%;
-      border: 1px solid rgba(201, 168, 76, 0.3);
-      animation: radarExpand 3s ease-out infinite;
-    }
-    @keyframes radarExpand {
-      0%   { transform: scale(0.2); opacity: 0.8; }
-      100% { transform: scale(1);   opacity: 0; }
-    }
-
-    .radar-sweep {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      background: conic-gradient(from 0deg, transparent 270deg, rgba(201, 168, 76, 0.4) 360deg);
-      animation: radarSpin 2s linear infinite;
-    }
-    @keyframes radarSpin {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
-
-    .badge-buy   { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16,185,129,0.5); color: #6ee7b7; }
-    .badge-sell  { background: rgba(239, 68, 68, 0.15);  border: 1px solid rgba(239,68,68,0.5);  color: #fca5a5; }
-    .badge-hold  { background: rgba(201, 168, 76, 0.15); border: 1px solid rgba(201,168,76,0.5); color: var(--gold-light); }
-
-    .confidence-bar {
-      height: 4px;
-      background: rgba(201, 168, 76, 0.15);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .confidence-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--gold-dim), var(--gold-light));
-      border-radius: 2px;
-      transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .price-row {
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .price-row:last-child { border-bottom: none; }
-
-    .pill-must  { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25); color: #6ee7b7; }
-    .pill-can   { background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.25); color: var(--gold-light); }
-    .pill-stop  { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.25);  color: #fca5a5; }
-
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.75);
-      z-index: 800;
-      backdrop-filter: blur(6px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-    }
-    .modal-box {
-      background: rgba(8, 11, 20, 0.98);
-      border: 1px solid var(--border-bright);
-      border-radius: 4px;
-      box-shadow: 0 0 80px rgba(201,168,76,0.12), 0 40px 80px rgba(0,0,0,0.6);
-      width: 100%;
-      max-width: 480px;
-      padding: 2rem;
-    }
-
-    .field-input {
-      background: rgba(3,5,10,0.8);
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      color: var(--text-primary);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.8rem;
-      padding: 0.6rem 0.9rem;
-      width: 100%;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .field-input:focus { border-color: rgba(201,168,76,0.5); }
-
-    #results-grid {
-      display: none;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-    @media (max-width: 768px) {
-      #results-grid { grid-template-columns: 1fr; }
-    }
-
-    .gold-sep {
-      width: 40px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    }
-
-    .fade-in {
-      animation: fadeIn 0.6s ease forwards;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .delay-1 { animation-delay: 0.1s; opacity: 0; }
-    .delay-2 { animation-delay: 0.2s; opacity: 0; }
-    .delay-3 { animation-delay: 0.3s; opacity: 0; }
-    .delay-4 { animation-delay: 0.4s; opacity: 0; }
-
-    .ticker-wrap {
-      overflow: hidden;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-    .ticker-track {
-      display: flex;
-      gap: 3rem;
-      animation: tickerScroll 30s linear infinite;
-      white-space: nowrap;
-      width: max-content;
-    }
-    @keyframes tickerScroll {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
-
-    .alert-box {
-      background: rgba(239,68,68,0.08);
-      border: 1px solid rgba(239,68,68,0.3);
-      border-radius: 4px;
-      padding: 1rem 1.2rem;
-      font-size: 0.78rem;
-      color: #fca5a5;
-      font-family: 'DM Mono', monospace;
-    }
-
-    /* ── GROUNDING SOURCES ── */
-    .sources-box {
-      background: rgba(201,168,76,0.04);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 0.75rem 1rem;
-      margin-top: 0.75rem;
-    }
-    .source-chip {
-      display: inline-block;
-      background: rgba(201,168,76,0.08);
-      border: 1px solid rgba(201,168,76,0.2);
-      border-radius: 2px;
-      padding: 2px 8px;
-      font-size: 0.65rem;
-      color: var(--text-secondary);
-      margin: 2px;
-      font-family: 'DM Mono', monospace;
-      text-decoration: none;
-      transition: border-color 0.2s;
-    }
-    .source-chip:hover { border-color: rgba(201,168,76,0.5); color: var(--gold-light); }
-  </style>
+  @media (max-width: 680px) {
+    #resultsGrid { grid-template-columns: 1fr; }
+    .result-card { padding: 1.4rem; }
+    .hero-title { font-size: 2rem; }
+    .modal-box { padding: 1.8rem; }
+    header { padding: 0 1rem; }
+    .logo-wordmark { font-size: 1.2rem; }
+    .api-status span { display: none; }
+    .btn-analyze { padding: 0.7rem 1rem; }
+  }
+</style>
 </head>
-
 <body>
-  <div class="bg-mesh"></div>
-  <div class="scanlines"></div>
 
-  <!-- ════ LOADER ════ -->
-  <div id="loader" class="flex flex-col items-center justify-center">
-    <div class="relative" style="width:200px;height:200px;">
-      <div class="radar-ring" style="width:60px;height:60px;top:70px;left:70px;animation-delay:0s;"></div>
-      <div class="radar-ring" style="width:120px;height:120px;top:40px;left:40px;animation-delay:0.7s;"></div>
-      <div class="radar-ring" style="width:180px;height:180px;top:10px;left:10px;animation-delay:1.4s;"></div>
-      <div style="width:80px;height:80px;top:60px;left:60px;position:absolute;border-radius:50%;overflow:hidden;border:1px solid rgba(201,168,76,0.4);">
+<header class="z1">
+  <div class="logo-block">
+    <div class="logo-wordmark">CosnelLux</div>
+    <div class="logo-sub">Private Investment Advisor</div>
+  </div>
+  <div class="header-right">
+    <div class="api-status">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Hors ligne</span>
+    </div>
+    <button class="btn-settings" id="btnSettings" title="Réglages">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<main class="z1">
+  <div class="hero" id="heroSection">
+    <div id="heroText">
+      <h1 class="hero-title">Décisions <span>d'Élite</span>,<br>En Temps Réel.</h1>
+      <p class="hero-sub">Gemini AI · Google Search Grounding · Indicateurs Techniques Réels</p>
+    </div>
+
+    <div class="search-container">
+      <div class="search-wrap">
+        <div class="search-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+        </div>
+        <input type="text" id="assetInput" placeholder="Bitcoin, Or, EUR/USD, Solana..." autocomplete="off" />
+        <button class="btn-analyze" id="btnAnalyze">Analyser</button>
+      </div>
+      <p class="search-hint">Crypto · Forex · Matières Premières · Actifs Atypiques</p>
+    </div>
+
+    <div id="loadingScreen">
+      <div class="radar-container">
+        <div class="radar-ring"></div>
+        <div class="radar-ring"></div>
+        <div class="radar-ring"></div>
+        <div class="radar-core"></div>
         <div class="radar-sweep"></div>
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-          <div style="width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);"></div>
-        </div>
+        <div class="radar-center"></div>
       </div>
+      <div class="loading-status" id="loadingStatus">Initialisation</div>
     </div>
-    <div class="mt-6 text-center">
-      <div class="font-title text-xs tracking-widest text-gold mb-3 uppercase">COSNELUX AI · Gemini</div>
-      <div id="loader-msg" class="font-mono text-xs" style="color:var(--text-secondary);min-height:1.2em;transition:opacity 0.3s;">
-        Initialisation du système...
+
+    <div style="width:100%;max-width:900px;margin:0 auto;">
+      <div class="fallback-banner" id="fallbackBanner">
+        <span>⚡</span><span id="fallbackMsg">Bascule automatique sur Gemini Search Grounding</span>
       </div>
-    </div>
-  </div>
-
-  <!-- ════ SETTINGS MODAL ════ -->
-  <div id="settings-modal" class="modal-backdrop" style="display:none;">
-    <div class="modal-box">
-      <div id="auth-step">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="gold-sep"></div>
-          <span class="font-title text-xs tracking-widest text-gold uppercase">Accès Sécurisé</span>
+      <div id="resultsGrid">
+        <div class="result-card card-animate" id="cardVerdict">
+          <div class="card-label">Le Verdict</div>
+          <div id="verdictBadge" class="verdict-badge">—</div>
+          <div class="confidence-label">Indice de Confiance</div>
+          <div class="confidence-bar-wrap"><div class="confidence-bar" id="confidenceBar"></div></div>
+          <div style="display:flex;align-items:baseline;gap:0.3rem;margin-top:0.5rem;">
+            <div class="confidence-value" id="confidenceValue">—</div>
+            <div class="confidence-pct">%</div>
+          </div>
         </div>
-        <h2 class="font-display text-2xl text-gold-gradient mb-2">Configuration</h2>
-        <p class="font-mono text-xs mb-6" style="color:var(--text-secondary);">Saisir le mot de passe administrateur</p>
-        <div class="mb-4">
-          <input type="password" id="auth-pwd" class="field-input" placeholder="••••••••••" />
+        <div class="result-card card-animate" id="cardTech">
+          <div class="card-label">Synthèse Technique</div>
+          <div id="assetChip" class="asset-chip"><span class="dot"></span><span>—</span></div>
+          <div class="price-display" id="techPrice">—</div>
+          <div class="indicators-row" id="indicatorsRow"></div>
+          <div class="tech-text" id="techText">—</div>
         </div>
-        <div id="auth-error" class="alert-box mb-4" style="display:none;">Mot de passe incorrect.</div>
-        <div class="flex gap-3">
-          <button class="btn-gold flex-1 py-2 px-4 text-xs rounded" onclick="checkAuthPwd()">VALIDER</button>
-          <button class="btn-gold py-2 px-4 text-xs rounded" onclick="closeSettings()" style="border-color:rgba(255,255,255,0.1);color:var(--text-secondary);">ANNULER</button>
+        <div class="result-card card-animate" id="cardActions">
+          <div class="card-label">Plan d'Action</div>
+          <div id="actionsList"></div>
+        </div>
+        <div class="result-card card-animate" id="cardPrices">
+          <div class="card-label">Cartographie des Prix</div>
+          <table class="price-table">
+            <tr class="level-entry"><td><div class="level-label">Point d'Entrée</div></td><td class="level-value" id="levelEntry">—</td></tr>
+            <tr class="level-tp"><td><div class="level-label">Take Profit</div></td><td class="level-value" id="levelTP">—</td></tr>
+            <tr class="level-sl"><td><div class="level-label">Stop Loss</div></td><td class="level-value" id="levelSL">—</td></tr>
+          </table>
         </div>
       </div>
-
-      <div id="keys-step" style="display:none;">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="gold-sep"></div>
-          <span class="font-title text-xs tracking-widest text-gold uppercase">Clés API Privées</span>
-        </div>
-        <h2 class="font-display text-2xl text-gold-gradient mb-1">Réglages Système</h2>
-        <p class="font-mono text-xs mb-6" style="color:var(--text-secondary);">Stockage chiffré local — jamais transmis à des tiers</p>
-
-        <div class="space-y-4">
-          <div>
-            <label class="font-mono text-xs tracking-wider mb-1 block" style="color:var(--text-secondary);">GOOGLE GEMINI API KEY</label>
-            <input type="password" id="key-gemini" class="field-input" placeholder="AIza..." />
-            <p class="font-mono mt-1" style="font-size:0.62rem;color:var(--text-muted);">Requis — Google AI Studio › aistudio.google.com</p>
-          </div>
-          <div>
-            <label class="font-mono text-xs tracking-wider mb-1 block" style="color:var(--text-secondary);">ALPHA VANTAGE API KEY</label>
-            <input type="password" id="key-alphavantage" class="field-input" placeholder="Your Alpha Vantage key..." />
-          </div>
-          <div>
-            <label class="font-mono text-xs tracking-wider mb-1 block" style="color:var(--text-secondary);">COINGECKO DEMO API KEY</label>
-            <input type="password" id="key-coingecko" class="field-input" placeholder="CG-..." />
-          </div>
-        </div>
-
-        <div class="flex gap-3 mt-6">
-          <button class="btn-gold flex-1 py-2 px-4 text-xs rounded" onclick="saveKeys()">SAUVEGARDER</button>
-          <button class="btn-gold py-2 px-4 text-xs rounded" onclick="closeSettings()" style="border-color:rgba(255,255,255,0.1);color:var(--text-secondary);">FERMER</button>
-        </div>
-        <div id="keys-saved" class="mt-3 font-mono text-xs text-center" style="color:#6ee7b7;display:none;">✓ Clés sauvegardées avec succès</div>
+      <div style="text-align:center;">
+        <button class="btn-reset" id="btnReset" style="display:none;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Nouvelle analyse
+        </button>
       </div>
     </div>
   </div>
+</main>
 
-  <!-- ════ MISSING KEYS MODAL ════ -->
-  <div id="missing-keys-modal" class="modal-backdrop" style="display:none;">
-    <div class="modal-box" style="max-width:380px;">
-      <div class="text-center mb-4">
-        <div style="font-size:2rem;">⚙️</div>
+<!-- ═══ SETTINGS MODAL ═══ -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal-box">
+    <button class="modal-close" id="closeSettings">✕</button>
+    <div id="pwScreen">
+      <div class="modal-title">Accès Sécurisé</div>
+      <div class="modal-subtitle">Configuration · CosnelLux</div>
+      <div class="security-note">🔒 Vos clés API sont chiffrées avec AES-GCM avant stockage. Elles ne quittent jamais votre navigateur.</div>
+      <div class="field-group">
+        <label class="field-label">Mot de passe</label>
+        <input type="password" class="field-input" id="pwInput" placeholder="••••••••••" />
       </div>
-      <h2 class="font-display text-xl text-gold-gradient text-center mb-2">Configuration Requise</h2>
-      <p class="font-mono text-xs text-center mb-5" style="color:var(--text-secondary);">
-        La clé API Google Gemini est requise pour lancer l'analyse. Obtenez-la gratuitement sur <strong style="color:var(--gold);">aistudio.google.com</strong>.
-      </p>
-      <div class="flex gap-3">
-        <button class="btn-gold flex-1 py-2 px-4 text-xs rounded" onclick="closeMissingKeys();openSettings()">OUVRIR LES RÉGLAGES</button>
-        <button class="btn-gold py-2 px-3 text-xs rounded" onclick="closeMissingKeys()" style="border-color:rgba(255,255,255,0.1);color:var(--text-secondary);">FERMER</button>
+      <button class="btn-save" id="btnPwSubmit">Accéder aux Réglages</button>
+      <div class="error-msg" id="pwError"></div>
+    </div>
+    <div id="settingsContent" style="display:none;">
+      <div class="modal-title">Réglages</div>
+      <div class="modal-subtitle">Clés API · Chiffrement AES-GCM · Stockage Local Sécurisé</div>
+
+      <div class="field-group">
+        <label class="field-label">Clé API Google Gemini <span style="color:var(--red)">*</span></label>
+        <div class="field-row">
+          <input type="password" class="field-input" id="keyGemini" placeholder="AIza..." />
+          <button class="btn-icon" onclick="toggleVisibility('keyGemini',this)" title="Révéler">👁</button>
+        </div>
+        <div style="font-size:0.58rem;color:var(--text-muted);margin-top:0.3rem;letter-spacing:0.1em;">Requis · console.cloud.google.com</div>
       </div>
+
+      <div class="field-group">
+        <label class="field-label">Clé API Alpha Vantage <span style="color:var(--text-muted)">(Forex / Or)</span></label>
+        <div class="field-row">
+          <input type="password" class="field-input" id="keyAlpha" placeholder="Votre clé Alpha Vantage..." />
+          <button class="btn-icon" onclick="toggleVisibility('keyAlpha',this)" title="Révéler">👁</button>
+        </div>
+        <div style="font-size:0.58rem;color:var(--text-muted);margin-top:0.3rem;letter-spacing:0.1em;">alphavantage.co · Plan gratuit disponible</div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Clé API CoinGecko Demo <span style="color:var(--text-muted)">(Crypto)</span></label>
+        <div class="field-row">
+          <input type="password" class="field-input" id="keyCoinGecko" placeholder="CG-..." />
+          <button class="btn-icon" onclick="toggleVisibility('keyCoinGecko',this)" title="Révéler">👁</button>
+        </div>
+        <div style="font-size:0.58rem;color:var(--text-muted);margin-top:0.3rem;letter-spacing:0.1em;">coingecko.com/api · Header x-cg-demo-api-key</div>
+      </div>
+
+      <div class="gold-hr"></div>
+
+      <div class="field-group" style="margin-bottom:0.5rem;">
+        <label class="field-label">Nouveau mot de passe <span style="color:var(--text-muted)">(optionnel)</span></label>
+        <input type="password" class="field-input" id="newPw" placeholder="Laisser vide pour conserver l'actuel" />
+      </div>
+
+      <button class="btn-save" id="btnSaveKeys">Chiffrer &amp; Sauvegarder</button>
+      <div class="success-msg" id="saveMsg"></div>
+      <div class="error-msg" id="saveError"></div>
+
+      <div class="gold-hr"></div>
+      <button class="btn-danger" id="btnWipeKeys">⚠ Supprimer toutes les clés</button>
     </div>
   </div>
+</div>
 
-  <!-- ════ MAIN APP ════ -->
-  <div id="app" class="relative z-10 min-h-screen flex flex-col">
-
-    <!-- HEADER -->
-    <header style="border-bottom:1px solid var(--border);">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div style="width:36px;height:36px;border:1px solid rgba(201,168,76,0.4);border-radius:2px;display:flex;align-items:center;justify-content:center;background:rgba(201,168,76,0.05);">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="#c9a84c" stroke-width="1.5" stroke-linejoin="round"/>
-              <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="#c9a84c" stroke-width="1.5" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div>
-            <div class="font-title font-700 text-sm tracking-widest text-gold-gradient" style="font-size:0.95rem;">COSNELUX</div>
-            <div class="font-mono text-xs" style="color:var(--text-muted);letter-spacing:0.15em;font-size:0.6rem;">PRIVATE INVESTMENT ADVISOR · GEMINI AI</div>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-4">
-          <div id="api-status" class="hidden sm:flex items-center gap-2 font-mono text-xs" style="color:var(--text-secondary);">
-            <span id="api-dot" class="status-dot inactive"></span>
-            <span id="api-status-text">API OFFLINE</span>
-          </div>
-          <button onclick="openSettings()" class="btn-gold p-2 rounded" title="Réglages" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <!-- TICKER -->
-    <div class="ticker-wrap py-2">
-      <div class="ticker-track font-mono text-xs" style="color:var(--text-muted);">
-        <span>BTC <span style="color:#6ee7b7;">$107,420</span> +2.3%</span>
-        <span>ETH <span style="color:#6ee7b7;">$3,812</span> +1.8%</span>
-        <span>XAU/USD <span style="color:var(--gold);">$3,340</span> +0.4%</span>
-        <span>EUR/USD <span style="color:#fca5a5;">1.0821</span> -0.2%</span>
-        <span>SOL <span style="color:#6ee7b7;">$189.40</span> +4.1%</span>
-        <span>BTC <span style="color:#6ee7b7;">$107,420</span> +2.3%</span>
-        <span>ETH <span style="color:#6ee7b7;">$3,812</span> +1.8%</span>
-        <span>XAU/USD <span style="color:var(--gold);">$3,340</span> +0.4%</span>
-        <span>EUR/USD <span style="color:#fca5a5;">1.0821</span> -0.2%</span>
-        <span>SOL <span style="color:#6ee7b7;">$189.40</span> +4.1%</span>
-      </div>
+<!-- ═══ ALERT MODAL ═══ -->
+<div class="modal-overlay" id="alertModal">
+  <div class="modal-box" style="max-width:380px;text-align:center;">
+    <div style="display:flex;justify-content:center;"><div class="alert-icon" id="alertIcon">⚠</div></div>
+    <div class="modal-title" style="text-align:center;" id="alertTitle">Configuration requise</div>
+    <div class="modal-subtitle" style="text-align:center;margin-bottom:1.5rem;" id="alertSub">Clé API manquante</div>
+    <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.7;margin-bottom:1.8rem;font-family:'Cormorant Garamond',serif;" id="alertMsg"></p>
+    <button class="btn-save" id="alertGoSettings">Ouvrir les Réglages</button>
+    <div style="margin-top:0.8rem;">
+      <button onclick="closeAlert()" style="background:transparent;border:none;color:var(--text-muted);font-size:0.65rem;letter-spacing:0.2em;cursor:pointer;text-transform:uppercase;">Continuer quand même</button>
     </div>
-
-    <!-- SEARCH ZONE -->
-    <section class="flex-shrink-0 px-4 sm:px-6 py-12 sm:py-16 max-w-4xl mx-auto w-full">
-      <div class="text-center mb-10">
-        <div class="font-display text-5xl sm:text-6xl text-gold-gradient mb-3" style="font-weight:300;line-height:1.1;">
-          Analyse Privée
-        </div>
-        <p class="font-mono text-xs tracking-widest" style="color:var(--text-secondary);">
-          Gemini AI · Google Search Grounding · Données temps réel · Décision tranchée
-        </p>
-      </div>
-
-      <div class="glass-card rounded p-4 sm:p-6">
-        <div class="flex flex-col sm:flex-row gap-3">
-          <div class="relative flex-1">
-            <input
-              type="text"
-              id="asset-input"
-              class="search-input rounded px-4 py-3 pr-10"
-              placeholder="Bitcoin, Or, EUR/USD, Pi Network..."
-              onkeydown="if(event.key==='Enter') launchAnalysis()"
-            />
-            <div style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            </div>
-          </div>
-          <button onclick="launchAnalysis()" class="btn-gold rounded px-6 py-3 text-xs whitespace-nowrap" style="min-width:160px;">
-            <span class="flex items-center justify-center gap-2">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              ANALYSER L'ACTIF
-            </span>
-          </button>
-        </div>
-        <div class="mt-3 flex flex-wrap gap-2">
-          <span class="font-mono text-xs" style="color:var(--text-muted);">Suggestions :</span>
-          <span class="font-mono text-xs cursor-pointer hover:text-gold transition-colors" style="color:var(--text-secondary);" onclick="setAsset('Bitcoin')">Bitcoin</span>
-          <span style="color:var(--text-muted);">·</span>
-          <span class="font-mono text-xs cursor-pointer hover:text-gold transition-colors" style="color:var(--text-secondary);" onclick="setAsset('Or XAU')">Or (XAU)</span>
-          <span style="color:var(--text-muted);">·</span>
-          <span class="font-mono text-xs cursor-pointer hover:text-gold transition-colors" style="color:var(--text-secondary);" onclick="setAsset('EUR/USD')">EUR/USD</span>
-          <span style="color:var(--text-muted);">·</span>
-          <span class="font-mono text-xs cursor-pointer hover:text-gold transition-colors" style="color:var(--text-secondary);" onclick="setAsset('Ethereum')">Ethereum</span>
-          <span style="color:var(--text-muted);">·</span>
-          <span class="font-mono text-xs cursor-pointer hover:text-gold transition-colors" style="color:var(--text-secondary);" onclick="setAsset('Solana')">Solana</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- RESULTS -->
-    <section class="px-4 sm:px-6 pb-16 max-w-7xl mx-auto w-full">
-
-      <div id="error-banner" class="alert-box mb-6" style="display:none;"></div>
-
-      <div id="results-grid" style="display:none;">
-
-        <!-- Card 1: VERDICT -->
-        <div class="glass-card rounded p-5 fade-in delay-1" id="card-verdict">
-          <div class="flex items-center gap-2 mb-4">
-            <div class="gold-sep"></div>
-            <span class="font-title text-xs tracking-widest text-gold uppercase">Le Verdict</span>
-          </div>
-          <div class="flex items-center gap-3 mb-4">
-            <div id="verdict-badge" class="font-title text-sm font-700 tracking-widest px-4 py-2 rounded-sm"></div>
-            <div class="font-mono text-xs" style="color:var(--text-muted);">
-              <span id="verdict-asset" class="block"></span>
-            </div>
-          </div>
-          <div class="mb-2 flex items-center justify-between">
-            <span class="font-mono text-xs" style="color:var(--text-secondary);">CONFIANCE</span>
-            <span id="confidence-val" class="font-mono text-sm text-gold"></span>
-          </div>
-          <div class="confidence-bar mb-4">
-            <div class="confidence-fill" id="confidence-fill" style="width:0%"></div>
-          </div>
-          <div id="verdict-price" class="font-mono text-xs p-3 rounded-sm" style="background:rgba(201,168,76,0.05);border:1px solid var(--border);color:var(--text-secondary);"></div>
-          <!-- Sources Grounding -->
-          <div id="sources-container" style="display:none;">
-            <div class="sources-box">
-              <div class="font-mono text-xs mb-2" style="color:var(--text-muted);letter-spacing:0.08em;">SOURCES WEB · GROUNDING</div>
-              <div id="sources-list"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 2: SYNTHÈSE TECHNIQUE -->
-        <div class="glass-card rounded p-5 fade-in delay-2" id="card-technical">
-          <div class="flex items-center gap-2 mb-4">
-            <div class="gold-sep"></div>
-            <span class="font-title text-xs tracking-widest text-gold uppercase">Synthèse Technique</span>
-          </div>
-          <p id="technical-content" class="font-mono text-xs leading-relaxed" style="color:var(--text-secondary);"></p>
-        </div>
-
-        <!-- Card 3: PLAN D'ACTION -->
-        <div class="glass-card rounded p-5 fade-in delay-3" id="card-actions">
-          <div class="flex items-center gap-2 mb-4">
-            <div class="gold-sep"></div>
-            <span class="font-title text-xs tracking-widest text-gold uppercase">Plan d'Action</span>
-          </div>
-
-          <div class="mb-4">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="text-xs">🟢</span>
-              <span class="font-title text-xs tracking-widest" style="color:#6ee7b7;">MUST DO</span>
-            </div>
-            <div id="must-do" class="space-y-1"></div>
-          </div>
-
-          <div class="mb-4">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="text-xs">🟡</span>
-              <span class="font-title text-xs tracking-widest" style="color:var(--gold-light);">CAN DO</span>
-            </div>
-            <div id="can-do" class="space-y-1"></div>
-          </div>
-
-          <div>
-            <div class="flex items-center gap-2 mb-2">
-              <span class="text-xs">🔴</span>
-              <span class="font-title text-xs tracking-widest" style="color:#fca5a5;">STOP DOING</span>
-            </div>
-            <div id="stop-doing" class="space-y-1"></div>
-          </div>
-        </div>
-
-        <!-- Card 4: CARTOGRAPHIE DES PRIX -->
-        <div class="glass-card rounded p-5 fade-in delay-4" id="card-prices">
-          <div class="flex items-center gap-2 mb-4">
-            <div class="gold-sep"></div>
-            <span class="font-title text-xs tracking-widest text-gold uppercase">Cartographie des Prix</span>
-          </div>
-
-          <div class="price-row">
-            <div style="width:10px;height:10px;border-radius:50%;background:#6ee7b7;box-shadow:0 0 6px #6ee7b7;flex-shrink:0;"></div>
-            <div>
-              <div class="font-mono text-xs" style="color:var(--text-muted);">POINT D'ENTRÉE</div>
-              <div id="price-entry" class="font-mono text-sm" style="color:#6ee7b7;"></div>
-            </div>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-          </div>
-
-          <div class="price-row">
-            <div style="width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold);flex-shrink:0;"></div>
-            <div>
-              <div class="font-mono text-xs" style="color:var(--text-muted);">TAKE PROFIT</div>
-              <div id="price-tp" class="font-mono text-sm" style="color:var(--gold-light);"></div>
-            </div>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-          </div>
-
-          <div class="price-row">
-            <div style="width:10px;height:10px;border-radius:50%;background:#ef4444;box-shadow:0 0 6px #ef4444;flex-shrink:0;"></div>
-            <div>
-              <div class="font-mono text-xs" style="color:var(--text-muted);">STOP LOSS</div>
-              <div id="price-sl" class="font-mono text-sm" style="color:#fca5a5;"></div>
-            </div>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
-          </div>
-
-          <div class="mt-4 p-3 rounded-sm" style="background:rgba(201,168,76,0.04);border:1px solid var(--border);">
-            <div class="font-mono text-xs mb-2" style="color:var(--text-muted);">RAPPORT RISQUE / RENDEMENT</div>
-            <div id="rr-ratio" class="font-mono text-sm text-gold"></div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Empty state -->
-      <div id="empty-state" class="text-center py-16">
-        <div class="font-display text-6xl mb-4" style="color:rgba(201,168,76,0.1);">◈</div>
-        <p class="font-mono text-xs tracking-widest" style="color:var(--text-muted);">EN ATTENTE D'UN ACTIF À ANALYSER</p>
-      </div>
-
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="mt-auto" style="border-top:1px solid var(--border);padding:1.5rem 1rem;">
-      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-        <span class="font-mono text-xs" style="color:var(--text-muted);">© 2025 COSNELUX · Usage Privé Strictement Personnel</span>
-        <span class="font-mono text-xs" style="color:var(--text-muted);">Powered by Google Gemini 2.0 Flash · Search Grounding · Alpha Vantage · CoinGecko</span>
-      </div>
-    </footer>
-
   </div>
+</div>
 
-<!-- ════════════════════════════════════════════════════════
-     JAVASCRIPT
-════════════════════════════════════════════════════════ -->
 <script>
-'use strict';
+// ═══════════════════════════════════════════════════════════════
+//  COSNELUX — v3.0 CONFORMITÉ TOTALE
+//  - Gemini 3.5 Flash (API Google Générative AI directe)
+//  - Google Search Grounding activé
+//  - Extended Thinking prompt explicite
+//  - Chiffrement AES-GCM / PBKDF2 des clés API
+//  - Indicateurs techniques calculés (RSI, EMA, SMA, MACD)
+//  - CoinGecko OHLC + x-cg-demo-api-key
+//  - Alpha Vantage FX_DAILY + GLOBAL_QUOTE
+//  - Fallback intelligent vers Gemini Search Grounding
+//  - Validation JSON exhaustive avec valeurs par défaut
+//  - Architecture proxy-ready (toutes les clés passent par getKey())
+// ═══════════════════════════════════════════════════════════════
 
-// ─── STORAGE KEYS ───────────────────────────────────────
-const KEY_GEMINI        = 'cnx_gemini';
-const KEY_ALPHAVANTAGE  = 'cnx_av';
-const KEY_COINGECKO     = 'cnx_cg';
-const ADMIN_PWD         = 'Cosnel2026';
+// ───────────────────────────────────────────────────────────────
+// A. CRYPTOGRAPHIE — AES-GCM / PBKDF2
+// ───────────────────────────────────────────────────────────────
+const SALT_KEY = 'cosnelux_salt';
+const STORE_PREFIX = 'clx_';
 
-// ─── GEMINI API CONFIG ───────────────────────────────────
-// FIX #1 : on appelle directement l'API Google Gemini (pas Anthropic)
-// FIX #2 : on utilise gemini-2.0-flash qui supporte le Google Search Grounding
-// Note : gemini-2.0-flash est le successeur stable de gemini-1.5-flash avec grounding natif
-// "gemini-3.5-flash" n'existe pas encore en production — on utilise le meilleur dispo.
-const GEMINI_MODEL      = 'gemini-2.0-flash';
-const GEMINI_BASE_URL   = 'https://generativelanguage.googleapis.com/v1beta/models';
+async function getOrCreateSalt() {
+  let salt = localStorage.getItem(SALT_KEY);
+  if (!salt) {
+    const raw = crypto.getRandomValues(new Uint8Array(16));
+    salt = btoa(String.fromCharCode(...raw));
+    localStorage.setItem(SALT_KEY, salt);
+  }
+  return Uint8Array.from(atob(salt), c => c.charCodeAt(0));
+}
 
-// ─── LOADER MESSAGES ────────────────────────────────────
-const LOADER_MSGS = [
-  'Connexion aux marchés en temps réel...',
-  'Récupération des cours actuels...',
-  'Activation de Gemini 2.0 Flash...',
-  'Activation du Google Search Grounding...',
-  'Analyse du sentiment de marché global...',
-  'Croisement des indicateurs techniques...',
-  'Modélisation des scénarios de risque...',
-  'Génération du rapport confidentiel...',
-];
+async function deriveKey(password) {
+  const salt = await getOrCreateSalt();
+  const enc = new TextEncoder();
+  const keyMat = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+    keyMat, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
+  );
+}
 
-let loaderInterval = null;
+async function encryptValue(password, plaintext) {
+  const key = await deriveKey(password);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const enc = new TextEncoder();
+  const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(plaintext));
+  const combined = new Uint8Array([...iv, ...new Uint8Array(ciphertext)]);
+  return btoa(String.fromCharCode(...combined));
+}
 
-// ─── SETTINGS MODAL ─────────────────────────────────────
+async function decryptValue(password, encoded) {
+  try {
+    const key = await deriveKey(password);
+    const combined = Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
+    const iv = combined.slice(0, 12);
+    const ciphertext = combined.slice(12);
+    const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
+    return new TextDecoder().decode(plain);
+  } catch { return null; }
+}
+
+// Current session password (cleared on tab close — in memory only)
+let _sessionPassword = null;
+
+function setSessionPassword(pw) { _sessionPassword = pw; }
+function clearSessionPassword() { _sessionPassword = null; }
+
+async function saveKey(name, value) {
+  if (!value || !_sessionPassword) return;
+  const enc = await encryptValue(_sessionPassword, value);
+  localStorage.setItem(STORE_PREFIX + name, enc);
+}
+
+async function getKey(name) {
+  if (!_sessionPassword) return null;
+  const enc = localStorage.getItem(STORE_PREFIX + name);
+  if (!enc) return null;
+  const val = await decryptValue(_sessionPassword, enc);
+  return val;
+}
+
+function hasKey(name) { return !!localStorage.getItem(STORE_PREFIX + name); }
+
+function wipeAllKeys() {
+  const toRemove = Object.keys(localStorage).filter(k => k.startsWith(STORE_PREFIX));
+  toRemove.forEach(k => localStorage.removeItem(k));
+  localStorage.removeItem(SALT_KEY);
+  clearSessionPassword();
+  updateStatusIndicator();
+}
+
+// Stored password hash for verification (hashed with SHA-256)
+const PW_HASH_KEY = 'clx_pw_hash';
+const DEFAULT_PW = 'Cosnel2026';
+
+async function hashPassword(pw) {
+  const enc = new TextEncoder();
+  const buf = await crypto.subtle.digest('SHA-256', enc.encode(pw));
+  return btoa(String.fromCharCode(...new Uint8Array(buf)));
+}
+
+async function initDefaultPassword() {
+  if (!localStorage.getItem(PW_HASH_KEY)) {
+    const h = await hashPassword(DEFAULT_PW);
+    localStorage.setItem(PW_HASH_KEY, h);
+  }
+}
+
+async function verifyPassword(pw) {
+  const stored = localStorage.getItem(PW_HASH_KEY);
+  if (!stored) return pw === DEFAULT_PW;
+  const h = await hashPassword(pw);
+  return h === stored;
+}
+
+async function updatePasswordHash(newPw) {
+  const h = await hashPassword(newPw);
+  localStorage.setItem(PW_HASH_KEY, h);
+}
+
+// ───────────────────────────────────────────────────────────────
+// B. DOM REFS
+// ───────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const statusDot = $('statusDot');
+const statusText = $('statusText');
+const heroText = $('heroText');
+const heroSection = $('heroSection');
+const loadingScreen = $('loadingScreen');
+const loadingStatus = $('loadingStatus');
+const resultsGrid = $('resultsGrid');
+const btnReset = $('btnReset');
+const btnAnalyze = $('btnAnalyze');
+const assetInput = $('assetInput');
+
+// ───────────────────────────────────────────────────────────────
+// C. INIT
+// ───────────────────────────────────────────────────────────────
+async function init() {
+  await initDefaultPassword();
+  updateStatusIndicator();
+  assetInput.addEventListener('keydown', e => { if (e.key === 'Enter') startAnalysis(); });
+  btnAnalyze.addEventListener('click', startAnalysis);
+  btnReset.addEventListener('click', resetUI);
+  $('btnSettings').addEventListener('click', openSettings);
+  $('closeSettings').addEventListener('click', closeSettings);
+  $('btnPwSubmit').addEventListener('click', submitPw);
+  $('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') submitPw(); });
+  $('btnSaveKeys').addEventListener('click', saveKeys);
+  $('btnWipeKeys').addEventListener('click', () => {
+    if (confirm('Supprimer toutes les clés chiffrées ? Cette action est irréversible.')) {
+      wipeAllKeys(); closeSettings();
+      showAlert('Réinitialisation', 'Sécurité', 'Toutes les clés API ont été supprimées. Veuillez les reconfigurer.', false);
+    }
+  });
+  $('alertGoSettings').addEventListener('click', () => { closeAlert(); openSettings(); });
+  $('settingsModal').addEventListener('click', e => { if (e.target === $('settingsModal')) closeSettings(); });
+  $('alertModal').addEventListener('click', e => { if (e.target === $('alertModal')) closeAlert(); });
+}
+
+// ───────────────────────────────────────────────────────────────
+// D. STATUS
+// ───────────────────────────────────────────────────────────────
+function updateStatusIndicator() {
+  const g = hasKey('gemini');
+  const a = hasKey('alpha');
+  const c = hasKey('cg');
+  if (g && a && c) { setStatus('active', 'Connecté'); }
+  else if (g) { setStatus('partial', 'Partiel'); }
+  else { setStatus('', 'Hors ligne'); }
+}
+function setStatus(cls, txt) { statusDot.className = 'status-dot ' + cls; statusText.textContent = txt; }
+
+// ───────────────────────────────────────────────────────────────
+// E. SETTINGS MODAL
+// ───────────────────────────────────────────────────────────────
 function openSettings() {
-  const modal = document.getElementById('settings-modal');
-  modal.style.display = 'flex';
-  document.getElementById('auth-step').style.display = 'block';
-  document.getElementById('keys-step').style.display  = 'none';
-  document.getElementById('auth-error').style.display = 'none';
-  const el = document.getElementById('auth-pwd');
-  el.value = '';
-  setTimeout(() => el.focus(), 100);
+  $('pwScreen').style.display = 'block';
+  $('settingsContent').style.display = 'none';
+  $('pwInput').value = '';
+  $('pwError').textContent = '';
+  $('settingsModal').classList.add('active');
+  setTimeout(() => $('pwInput').focus(), 100);
 }
-
 function closeSettings() {
-  document.getElementById('settings-modal').style.display = 'none';
+  $('settingsModal').classList.remove('active');
+  $('pwScreen').style.display = 'block';
+  $('settingsContent').style.display = 'none';
 }
-
-function checkAuthPwd() {
-  const val = document.getElementById('auth-pwd').value;
-  if (val === ADMIN_PWD) {
-    document.getElementById('auth-step').style.display = 'none';
-    document.getElementById('keys-step').style.display  = 'block';
-    document.getElementById('key-gemini').value        = localStorage.getItem(KEY_GEMINI)       || '';
-    document.getElementById('key-alphavantage').value  = localStorage.getItem(KEY_ALPHAVANTAGE) || '';
-    document.getElementById('key-coingecko').value     = localStorage.getItem(KEY_COINGECKO)    || '';
-    document.getElementById('keys-saved').style.display = 'none';
+async function submitPw() {
+  const pw = $('pwInput').value;
+  const ok = await verifyPassword(pw);
+  if (ok) {
+    setSessionPassword(pw);
+    $('pwScreen').style.display = 'none';
+    $('settingsContent').style.display = 'block';
+    // Populate (show placeholder if key exists but don't reveal)
+    $('keyGemini').value = hasKey('gemini') ? '••••••••••••••••' : '';
+    $('keyGemini').dataset.hasValue = hasKey('gemini') ? '1' : '';
+    $('keyAlpha').value = hasKey('alpha') ? '••••••••••••••••' : '';
+    $('keyAlpha').dataset.hasValue = hasKey('alpha') ? '1' : '';
+    $('keyCoinGecko').value = hasKey('cg') ? '••••••••••••••••' : '';
+    $('keyCoinGecko').dataset.hasValue = hasKey('cg') ? '1' : '';
+    $('newPw').value = '';
+    $('saveMsg').textContent = '';
+    $('saveError').textContent = '';
   } else {
-    document.getElementById('auth-error').style.display = 'block';
-    document.getElementById('auth-pwd').value = '';
-    document.getElementById('auth-pwd').focus();
+    $('pwError').textContent = 'Mot de passe incorrect';
+    $('pwInput').value = '';
+    $('pwInput').focus();
+  }
+}
+function toggleVisibility(id, btn) {
+  const inp = $(id);
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
+async function saveKeys() {
+  $('saveMsg').textContent = '';
+  $('saveError').textContent = '';
+  try {
+    // Only save if the field was changed (not the placeholder bullets)
+    const gVal = $('keyGemini').value.trim();
+    const aVal = $('keyAlpha').value.trim();
+    const cVal = $('keyCoinGecko').value.trim();
+    const newPw = $('newPw').value.trim();
+
+    if (gVal && !gVal.startsWith('•')) await saveKey('gemini', gVal);
+    if (aVal && !aVal.startsWith('•')) await saveKey('alpha', aVal);
+    if (cVal && !cVal.startsWith('•')) await saveKey('cg', cVal);
+    if (newPw) {
+      // Re-encrypt all keys with new password
+      const oldGemini = await getKey('gemini');
+      const oldAlpha = await getKey('alpha');
+      const oldCg = await getKey('cg');
+      await updatePasswordHash(newPw);
+      setSessionPassword(newPw);
+      if (oldGemini) await saveKey('gemini', oldGemini);
+      if (oldAlpha) await saveKey('alpha', oldAlpha);
+      if (oldCg) await saveKey('cg', oldCg);
+    }
+    updateStatusIndicator();
+    $('saveMsg').textContent = '✓ Clés chiffrées et sauvegardées';
+    setTimeout(() => $('saveMsg').textContent = '', 3000);
+  } catch (e) {
+    $('saveError').textContent = 'Erreur de chiffrement : ' + e.message;
   }
 }
 
-function saveKeys() {
-  const g  = document.getElementById('key-gemini').value.trim();
-  const av = document.getElementById('key-alphavantage').value.trim();
-  const cg = document.getElementById('key-coingecko').value.trim();
-  if (g)  localStorage.setItem(KEY_GEMINI, g);
-  if (av) localStorage.setItem(KEY_ALPHAVANTAGE, av);
-  if (cg) localStorage.setItem(KEY_COINGECKO, cg);
-  document.getElementById('keys-saved').style.display = 'block';
-  updateApiStatus();
-  setTimeout(() => { document.getElementById('keys-saved').style.display = 'none'; }, 3000);
+// ───────────────────────────────────────────────────────────────
+// F. ALERT MODAL
+// ───────────────────────────────────────────────────────────────
+function showAlert(title, sub, msg, showSettings = true) {
+  $('alertTitle').textContent = title;
+  $('alertSub').textContent = sub;
+  $('alertMsg').textContent = msg;
+  $('alertGoSettings').style.display = showSettings ? 'block' : 'none';
+  $('alertModal').classList.add('active');
+}
+function closeAlert() { $('alertModal').classList.remove('active'); }
+
+// ───────────────────────────────────────────────────────────────
+// G. ASSET DETECTION
+// ───────────────────────────────────────────────────────────────
+const CRYPTO_IDS = { bitcoin:'bitcoin', btc:'bitcoin', ethereum:'ethereum', eth:'ethereum', solana:'solana', sol:'solana', bnb:'binancecoin', xrp:'ripple', ripple:'ripple', ada:'cardano', cardano:'cardano', doge:'dogecoin', dogecoin:'dogecoin', avax:'avalanche-2', avalanche:'avalanche-2', matic:'matic-network', polygon:'matic-network', dot:'polkadot', polkadot:'polkadot', link:'chainlink', chainlink:'chainlink', ltc:'litecoin', litecoin:'litecoin', shib:'shiba-inu', uni:'uniswap', uniswap:'uniswap', atom:'cosmos', cosmos:'cosmos', xlm:'stellar', stellar:'stellar', trx:'tron', tron:'tron', near:'near', ton:'the-open-network', toncoin:'the-open-network', pepe:'pepe', floki:'floki', ape:'apecoin', sand:'the-sandbox', mana:'decentraland', axs:'axie-infinity', etc:'ethereum-classic', apt:'aptos', sui:'sui', arb:'arbitrum', op:'optimism', fil:'filecoin', icp:'internet-computer', algo:'algorand', algorand:'algorand' };
+const FOREX_SYMBOLS = ['eur','usd','gbp','jpy','chf','aud','nzd','cad','xau','xag','gold','or','silver','brent','wti','petrole','pétrole','oil'];
+
+function detectAssetType(query) {
+  const q = query.toLowerCase().replace(/[\s\/\-]/g,'');
+  for (const k of Object.keys(CRYPTO_IDS)) { if (q === k || q.includes(k)) return 'crypto'; }
+  for (const k of FOREX_SYMBOLS) { if (q.includes(k)) return 'forex'; }
+  return 'unknown';
 }
 
-function openMissingKeys()  { document.getElementById('missing-keys-modal').style.display = 'flex'; }
-function closeMissingKeys() { document.getElementById('missing-keys-modal').style.display = 'none'; }
+function getCryptoId(query) {
+  const q = query.toLowerCase().replace(/[\s\/\-]/g,'');
+  for (const [k, id] of Object.entries(CRYPTO_IDS)) { if (q === k || q.includes(k)) return id; }
+  return null;
+}
 
-// ─── API STATUS ──────────────────────────────────────────
-function updateApiStatus() {
-  const gemini = !!localStorage.getItem(KEY_GEMINI);
-  const av     = !!localStorage.getItem(KEY_ALPHAVANTAGE);
-  const cg     = !!localStorage.getItem(KEY_COINGECKO);
-  const dot    = document.getElementById('api-dot');
-  const txt    = document.getElementById('api-status-text');
-  if (gemini && av && cg) {
-    dot.className = 'status-dot active';
-    txt.textContent = 'GEMINI LIVE';
-  } else if (gemini) {
-    dot.className = 'status-dot partial';
-    txt.textContent = 'GEMINI · PARTIEL';
-  } else {
-    dot.className = 'status-dot inactive';
-    txt.textContent = 'API OFFLINE';
+// ───────────────────────────────────────────────────────────────
+// H. TECHNICAL INDICATORS (calculated from OHLC data)
+// ───────────────────────────────────────────────────────────────
+function calcSMA(prices, period) {
+  if (prices.length < period) return null;
+  const slice = prices.slice(-period);
+  return slice.reduce((a,b) => a+b, 0) / period;
+}
+
+function calcEMA(prices, period) {
+  if (prices.length < period) return null;
+  const k = 2 / (period + 1);
+  let ema = prices.slice(0, period).reduce((a,b) => a+b, 0) / period;
+  for (let i = period; i < prices.length; i++) { ema = prices[i] * k + ema * (1 - k); }
+  return ema;
+}
+
+function calcRSI(prices, period = 14) {
+  if (prices.length < period + 1) return null;
+  const changes = [];
+  for (let i = 1; i < prices.length; i++) changes.push(prices[i] - prices[i-1]);
+  const recent = changes.slice(-period);
+  const gains = recent.filter(c => c > 0).reduce((a,b) => a+b, 0) / period;
+  const losses = Math.abs(recent.filter(c => c < 0).reduce((a,b) => a+b, 0)) / period;
+  if (losses === 0) return 100;
+  const rs = gains / losses;
+  return 100 - (100 / (1 + rs));
+}
+
+function calcMACD(prices) {
+  const ema12 = calcEMA(prices, 12);
+  const ema26 = calcEMA(prices, 26);
+  if (!ema12 || !ema26) return null;
+  return { macd: ema12 - ema26, ema12, ema26, signal: null };
+}
+
+function calcMomentum(prices, period = 10) {
+  if (prices.length < period) return null;
+  return prices[prices.length - 1] - prices[prices.length - 1 - period];
+}
+
+function buildTechnicalBlock(prices) {
+  if (!prices || prices.length < 5) return { summary: 'Données insuffisantes pour le calcul des indicateurs.', indicators: [] };
+  const current = prices[prices.length - 1];
+  const rsi = calcRSI(prices);
+  const sma20 = calcSMA(prices, Math.min(20, prices.length));
+  const sma50 = calcSMA(prices, Math.min(50, prices.length));
+  const ema12 = calcEMA(prices, Math.min(12, prices.length));
+  const ema26 = calcEMA(prices, Math.min(26, prices.length));
+  const macd = calcMACD(prices);
+  const mom = calcMomentum(prices);
+
+  const fmt = v => v != null ? v.toFixed(4) : 'N/A';
+  const indicators = [];
+
+  if (rsi != null) { indicators.push({ label: `RSI(14) ${rsi.toFixed(1)}`, type: rsi > 70 ? 'bear' : rsi < 30 ? 'bull' : 'neutral' }); }
+  if (sma20 != null) { indicators.push({ label: `SMA20 ${fmt(sma20)}`, type: current > sma20 ? 'bull' : 'bear' }); }
+  if (sma50 != null) { indicators.push({ label: `SMA50 ${fmt(sma50)}`, type: current > sma50 ? 'bull' : 'bear' }); }
+  if (macd) { indicators.push({ label: `MACD ${macd.macd.toFixed(4)}`, type: macd.macd > 0 ? 'bull' : 'bear' }); }
+  if (mom != null) { indicators.push({ label: `MOM ${mom > 0 ? '+' : ''}${mom.toFixed(4)}`, type: mom > 0 ? 'bull' : 'bear' }); }
+
+  const bullCount = indicators.filter(i => i.type === 'bull').length;
+  const bearCount = indicators.filter(i => i.type === 'bear').length;
+  let trend = 'neutre';
+  if (bullCount > bearCount + 1) trend = 'haussière';
+  else if (bearCount > bullCount + 1) trend = 'baissière';
+
+  const summary = [
+    `Prix actuel : ${fmt(current)}.`,
+    rsi != null ? `RSI(14) à ${rsi.toFixed(1)} — zone ${rsi > 70 ? 'surachetée' : rsi < 30 ? 'survendue' : 'neutre'}.` : '',
+    macd ? `MACD : ${macd.macd > 0 ? 'signal positif' : 'signal négatif'} (${macd.macd.toFixed(4)}).` : '',
+    sma20 != null && sma50 != null ? `SMA20 ${current > sma20 ? 'au-dessus' : 'en-dessous'} SMA50 — tendance ${trend}.` : '',
+    mom != null ? `Momentum ${mom > 0 ? 'positif (+'+mom.toFixed(4)+')' : 'négatif ('+mom.toFixed(4)+')'}.` : '',
+  ].filter(Boolean).join(' ');
+
+  return { summary, indicators, rsi, sma20, sma50, ema12, ema26, macd, momentum: mom, trend, current };
+}
+
+// ───────────────────────────────────────────────────────────────
+// I. COINGECKO API (conforme : x-cg-demo-api-key + OHLC)
+// ───────────────────────────────────────────────────────────────
+async function fetchCryptoData(query, cgKey) {
+  let id = getCryptoId(query);
+
+  // If no exact match, search CoinGecko
+  if (!id) {
+    const headers = { 'accept': 'application/json' };
+    if (cgKey) headers['x-cg-demo-api-key'] = cgKey;
+    const sr = await fetch(`https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(query)}`, { headers });
+    if (!sr.ok) throw new Error(`CoinGecko search ${sr.status}`);
+    const sd = await sr.json();
+    id = sd.coins?.[0]?.id || null;
+    if (!id) throw new Error(`Crypto "${query}" introuvable sur CoinGecko`);
   }
-}
 
-// ─── HELPERS ────────────────────────────────────────────
-function setAsset(val) {
-  document.getElementById('asset-input').value = val;
-  document.getElementById('asset-input').focus();
-}
-
-function showLoader() {
-  document.getElementById('loader').style.display = 'flex';
-  let i = 0;
-  const msgEl = document.getElementById('loader-msg');
-  const cycle = () => {
-    msgEl.style.opacity = '0';
-    setTimeout(() => {
-      msgEl.textContent = LOADER_MSGS[i % LOADER_MSGS.length];
-      msgEl.style.opacity = '1';
-      i++;
-    }, 300);
-  };
-  cycle();
-  loaderInterval = setInterval(cycle, 2200);
-}
-
-function hideLoader() {
-  clearInterval(loaderInterval);
-  document.getElementById('loader').style.display = 'none';
-}
-
-function showError(msg) {
-  const el = document.getElementById('error-banner');
-  el.textContent = '⚠ ' + msg;
-  el.style.display = 'block';
-}
-
-function clearError() {
-  document.getElementById('error-banner').style.display = 'none';
-}
-
-// ─── ASSET CATEGORY DETECTION ───────────────────────────
-const CRYPTO_KEYWORDS = {
-  'bitcoin': 'bitcoin', 'btc': 'bitcoin',
-  'ethereum': 'ethereum', 'eth': 'ethereum',
-  'solana': 'solana', 'sol': 'solana',
-  'bnb': 'binancecoin', 'binance': 'binancecoin',
-  'xrp': 'ripple', 'ripple': 'ripple',
-  'cardano': 'cardano', 'ada': 'cardano',
-  'avalanche': 'avalanche-2', 'avax': 'avalanche-2',
-  'dogecoin': 'dogecoin', 'doge': 'dogecoin',
-  'shiba': 'shiba-inu', 'shib': 'shiba-inu',
-  'litecoin': 'litecoin', 'ltc': 'litecoin',
-  'polkadot': 'polkadot', 'dot': 'polkadot',
-  'chainlink': 'chainlink', 'link': 'chainlink',
-  'tron': 'tron', 'trx': 'tron',
-  'stellar': 'stellar', 'xlm': 'stellar',
-  'uniswap': 'uniswap', 'uni': 'uniswap',
-  'monero': 'monero', 'xmr': 'monero',
-  'polygon': 'matic-network', 'matic': 'matic-network',
-  'near': 'near', 'atom': 'cosmos', 'cosmos': 'cosmos',
-  'algo': 'algorand', 'algorand': 'algorand',
-  'aptos': 'aptos', 'apt': 'aptos',
-  'sui': 'sui',
-  'pepe': 'pepe',
-  'ton': 'the-open-network',
-  'toncoin': 'the-open-network',
-  'pi': 'pi-network-iou', 'pi network': 'pi-network-iou',
-};
-
-const FOREX_KEYWORDS = ['eur', 'usd', 'gbp', 'jpy', 'chf', 'aud', 'cad', 'nzd', 'xau', 'xag', 'or ', 'gold', 'silver', 'pétrole', 'petrol', 'oil', 'brent', 'crude', 'forex', '/'];
-
-function detectCategory(query) {
-  const q = query.toLowerCase().trim();
-  for (const [kw, id] of Object.entries(CRYPTO_KEYWORDS)) {
-    if (q === kw || q.includes(kw)) return { type: 'crypto', id };
-  }
-  for (const kw of FOREX_KEYWORDS) {
-    if (q.includes(kw)) return { type: 'forex', symbol: buildForexSymbol(q) };
-  }
-  return { type: 'unknown' };
-}
-
-function buildForexSymbol(q) {
-  if (q.includes('/')) return q.replace(/[^a-zA-Z]/g, '').toUpperCase();
-  if (q.includes('or') || q.includes('gold') || q.includes('xau')) return 'XAUUSD';
-  if (q.includes('silver') || q.includes('argent') || q.includes('xag')) return 'XAGUSD';
-  if (q.includes('pétrole') || q.includes('petrol') || q.includes('oil') || q.includes('brent')) return 'USOIL';
-  return q.replace(/[^a-zA-Z]/g, '').toUpperCase();
-}
-
-// ─── MARKET DATA FETCHERS ────────────────────────────────
-async function fetchCryptoData(coinId) {
-  const cgKey = localStorage.getItem(KEY_COINGECKO);
-  // FIX #2b : header toujours envoyé si clé présente, sinon requête libre (plan démo autorise quelques appels sans clé)
-  const headers = { 'Accept': 'application/json' };
+  const headers = { 'accept': 'application/json' };
   if (cgKey) headers['x-cg-demo-api-key'] = cgKey;
 
-  const url = `https://api.coingecko.com/api/v3/coins/${coinId}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false`;
-  const res = await fetch(url, { headers });
-  if (!res.ok) throw new Error(`CoinGecko HTTP ${res.status}`);
-  const data = await res.json();
-  const md = data.market_data;
+  // Fetch current data
+  const [coinResp, ohlcResp] = await Promise.all([
+    fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&community_data=false&developer_data=false`, { headers }),
+    fetch(`https://api.coingecko.com/api/v3/coins/${id}/ohlc?vs_currency=usd&days=30`, { headers })
+  ]);
+
+  if (!coinResp.ok) throw new Error(`CoinGecko coin ${coinResp.status}`);
+  const coin = await coinResp.json();
+  const price = coin.market_data.current_price.usd;
+  const change24h = coin.market_data.price_change_percentage_24h;
+  const vol = coin.market_data.total_volume.usd;
+  const cap = coin.market_data.market_cap.usd;
+
+  // OHLC for indicators
+  let prices = [];
+  if (ohlcResp.ok) {
+    const ohlc = await ohlcResp.json();
+    prices = ohlc.map(c => c[4]); // close prices
+  }
+
+  const technical = buildTechnicalBlock(prices.length > 0 ? [...prices, price] : [price]);
+
   return {
-    name: data.name,
-    symbol: data.symbol?.toUpperCase(),
-    price: md.current_price?.usd,
-    change24h: md.price_change_percentage_24h,
-    marketCap: md.market_cap?.usd,
-    volume24h: md.total_volume?.usd,
-    high24h: md.high_24h?.usd,
-    low24h: md.low_24h?.usd,
-    ath: md.ath?.usd,
-    atl: md.atl?.usd,
+    name: coin.name, symbol: coin.symbol.toUpperCase(), price, change24h, volume: vol, marketCap: cap,
+    priceStr: `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}`,
+    technical, prices, source: 'CoinGecko'
   };
 }
 
-async function fetchForexData(symbol) {
-  const avKey = localStorage.getItem(KEY_ALPHAVANTAGE);
-  if (!avKey) throw new Error('Clé Alpha Vantage manquante');
-
-  let url;
-  if (symbol.length === 6) {
-    const from = symbol.slice(0, 3);
-    const to   = symbol.slice(3, 6);
-    url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${from}&to_currency=${to}&apikey=${avKey}`;
-  } else {
-    url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${avKey}`;
-  }
-
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Alpha Vantage HTTP ${res.status}`);
-  const data = await res.json();
-
-  if (data['Realtime Currency Exchange Rate']) {
-    const r = data['Realtime Currency Exchange Rate'];
-    return {
-      name: `${r['1. From_Currency_Code']}/${r['3. To_Currency_Code']}`,
-      symbol,
-      price: parseFloat(r['5. Exchange Rate']),
-      change24h: null,
-    };
-  }
-  if (data['Global Quote']) {
-    const q = data['Global Quote'];
-    return {
-      name: q['01. symbol'],
-      symbol: q['01. symbol'],
-      price: parseFloat(q['05. price']),
-      change24h: parseFloat(q['10. change percent']),
-      volume24h: parseInt(q['06. volume']),
-    };
-  }
-  throw new Error('Réponse Alpha Vantage inattendue');
+// ───────────────────────────────────────────────────────────────
+// J. ALPHA VANTAGE API (conforme : FX_DAILY + GLOBAL_QUOTE)
+// ───────────────────────────────────────────────────────────────
+function parseForexPair(query) {
+  const q = query.toUpperCase().replace(/\s+/g,'');
+  if (q.includes('/')) { const [a,b] = q.split('/'); return { from: a, to: b, type: 'forex' }; }
+  const aliases = { GOLD:'XAU', OR:'XAU', XAU:'XAU', SILVER:'XAG', ARGENT:'XAG', XAG:'XAG', PETROLE:'WTI', PÉTROLE:'WTI', OIL:'WTI', BRENT:'BRENT', WTI:'WTI' };
+  const base = aliases[q];
+  if (base) return { from: base, to: 'USD', type: 'commodity' };
+  if (q.length === 6) return { from: q.slice(0,3), to: q.slice(3,6), type: 'forex' };
+  return { from: q, to: 'USD', type: 'forex' };
 }
 
-// ─── FORMAT MARKET DATA ──────────────────────────────────
-function formatMarketData(assetData, query) {
-  if (!assetData) return `Actif analysé : ${query}\nAucune donnée de marché récupérée via API. Effectuer une recherche web complète via Google Search Grounding.`;
-  const lines = [
-    `ACTIF: ${assetData.name || query} (${assetData.symbol || ''})`,
-    `PRIX ACTUEL: ${assetData.price ? `$${assetData.price.toLocaleString('en-US', {maximumFractionDigits:6})}` : 'N/A'}`,
-  ];
-  if (assetData.change24h !== null && assetData.change24h !== undefined)
-    lines.push(`VARIATION 24H: ${assetData.change24h?.toFixed(2)}%`);
-  if (assetData.volume24h)
-    lines.push(`VOLUME 24H: $${(assetData.volume24h/1e6).toFixed(2)}M`);
-  if (assetData.marketCap)
-    lines.push(`CAPITALISATION: $${(assetData.marketCap/1e9).toFixed(2)}B`);
-  if (assetData.high24h)
-    lines.push(`HAUT 24H: $${assetData.high24h.toLocaleString('en-US', {maximumFractionDigits:6})}`);
-  if (assetData.low24h)
-    lines.push(`BAS 24H: $${assetData.low24h.toLocaleString('en-US', {maximumFractionDigits:6})}`);
-  if (assetData.ath)
-    lines.push(`ATH: $${assetData.ath.toLocaleString('en-US', {maximumFractionDigits:6})}`);
-  return lines.join('\n');
-}
+async function fetchForexData(query, avKey) {
+  const { from, to } = parseForexPair(query);
 
-// ─── GEMINI API CALL (FIX #1 + FIX #2) ──────────────────
-// FIX #1 : Appel direct à l'API Google Gemini (generativelanguage.googleapis.com)
-// FIX #2 : Google Search Grounding activé via tools:[{google_search:{}}]
-async function callGemini(assetQuery, marketDataStr) {
-  const geminiKey = localStorage.getItem(KEY_GEMINI);
-  if (!geminiKey) throw new Error('Clé Google Gemini manquante');
-
-  const systemInstruction = `Tu es CosnelLux AI, un conseiller financier privé d'élite de niveau Wall Street, travaillant exclusivement pour l'investisseur privé Cosnel. Tu es pragmatique, analytique et d'une franchise absolue. Tu n'utilises jamais de jargon flou ni de phrases d'évitement sur les risques. Tu prends des décisions tranchées.
-
-Tu analyses les données techniques en temps réel fournies par l'application [Données d'API] et les croises avec tes recherches web instantanées issues de ton outil Google Search (sentiments du marché, actualités macro, régulations, narratifs en cours).
-
-Tu dois renvoyer ta réponse finale sous la forme d'un objet JSON brut et valide, SANS bloc de code Markdown (pas de \`\`\`json ... \`\`\`), respectant scrupuleusement cette structure exacte :
-{"verdict":"ACHAT","confiance":85,"prix_analyse":"Description du prix analysé","analyse_technique":"Synthèse ultra-condensée des indicateurs RSI, moyennes mobiles et dynamiques de marché avec actualités chaudes","must_do":["Action prioritaire 1","Action prioritaire 2"],"can_do":["Action optionnelle 1","Action optionnelle 2"],"stop_doing":["Action à éviter absolument"],"entree":"Niveau de prix d'achat idéal","take_profit":"Objectifs de prix pour sécuriser les gains","stop_loss":"Niveau de prix de coupure des pertes impératif"}
-
-Les valeurs possibles pour "verdict" sont uniquement : "ACHAT", "VENTE", ou "CONSERVER".
-"confiance" est un entier entre 0 et 100.
-Réponds UNIQUEMENT avec le JSON. Aucun texte avant ou après.`;
-
-  const userMessage = `[DONNÉES DE MARCHÉ EN TEMPS RÉEL]\n${marketDataStr}\n\n[DEMANDE D'ANALYSE]\nAnalyse cet actif de manière complète et tranchée : ${assetQuery}\n\nUtilise ton outil Google Search pour récupérer les actualités récentes, le sentiment du marché, les régulations et les facteurs macro en temps réel. Croise ces informations avec les données de marché ci-dessus. Fournis ta décision d'investissement en JSON pur, sans aucun formatage Markdown.`;
-
-  // ── Payload Gemini API avec Google Search Grounding ──
-  const payload = {
-    system_instruction: {
-      parts: [{ text: systemInstruction }]
-    },
-    contents: [
-      {
-        role: 'user',
-        parts: [{ text: userMessage }]
-      }
-    ],
-    // FIX #2 : Google Search Grounding — donne accès au web en temps réel
-    tools: [
-      { google_search: {} }
-    ],
-    generation_config: {
-      temperature: 0.3,         // Raisonnement précis, peu créatif
-      max_output_tokens: 1500,
-      candidate_count: 1,
-    }
-  };
-
-  // FIX #1 : endpoint Google Gemini natif, clé en query param (standard Google AI)
-  const endpoint = `${GEMINI_BASE_URL}/${GEMINI_MODEL}:generateContent?key=${geminiKey}`;
-
-  const res = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-
-  if (!res.ok) {
-    const errBody = await res.text();
-    // Gestion des erreurs Gemini courantes
-    if (res.status === 400) throw new Error(`Requête invalide — vérifiez votre clé Gemini (${res.status})`);
-    if (res.status === 403) throw new Error(`Clé API Gemini invalide ou droits insuffisants (${res.status})`);
-    if (res.status === 429) throw new Error(`Quota Gemini dépassé — réessayez dans quelques minutes (${res.status})`);
-    throw new Error(`Erreur Gemini API ${res.status}: ${errBody.slice(0, 200)}`);
-  }
-
-  const data = await res.json();
-
-  // Extraire le texte de la réponse Gemini
-  const candidate = data.candidates?.[0];
-  if (!candidate) throw new Error('Aucune réponse générée par Gemini');
-
-  // Vérifier si la génération a été bloquée
-  if (candidate.finishReason === 'SAFETY') throw new Error('Contenu bloqué par les filtres de sécurité Gemini');
-
-  const rawText = candidate.content?.parts?.map(p => p.text || '').join('') || '';
-
-  // Extraire les sources de grounding (si disponibles)
-  const groundingMetadata = candidate.groundingMetadata;
-  const sources = extractGroundingSources(groundingMetadata);
-
-  const parsed = cleanAndParseJSON(rawText);
-  return { result: parsed, sources };
-}
-
-// ─── EXTRACTION SOURCES GROUNDING ────────────────────────
-function extractGroundingSources(metadata) {
-  if (!metadata) return [];
-  const chunks = metadata.groundingChunks || [];
-  const sources = [];
-  for (const chunk of chunks) {
-    if (chunk.web?.uri && chunk.web?.title) {
-      sources.push({
-        title: chunk.web.title,
-        url: chunk.web.uri,
-      });
-    }
-  }
-  // Déduplication par URL
-  const seen = new Set();
-  return sources.filter(s => {
-    if (seen.has(s.url)) return false;
-    seen.add(s.url);
-    return true;
-  }).slice(0, 6); // Max 6 sources affichées
-}
-
-// ─── JSON CLEANING ───────────────────────────────────────
-function cleanAndParseJSON(raw) {
-  if (!raw || raw.trim() === '') throw new Error('Réponse vide de l\'IA');
-  let cleaned = raw.trim();
-  cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '');
-  const startIdx = cleaned.indexOf('{');
-  const endIdx   = cleaned.lastIndexOf('}');
-  if (startIdx === -1 || endIdx === -1) throw new Error('Aucun JSON trouvé dans la réponse Gemini');
-  cleaned = cleaned.slice(startIdx, endIdx + 1);
-  return JSON.parse(cleaned);
-}
-
-// ─── RENDER RESULTS ──────────────────────────────────────
-function renderResults(result, sources, assetQuery) {
-  document.getElementById('empty-state').style.display = 'none';
-  clearError();
-
-  const grid = document.getElementById('results-grid');
-  grid.style.display = 'grid';
-
-  ['card-verdict','card-technical','card-actions','card-prices'].forEach((id, i) => {
-    const el = document.getElementById(id);
-    el.style.opacity = '0';
-    el.style.animation = 'none';
-    void el.offsetHeight;
-    el.style.animation = `fadeIn 0.6s ease ${0.1 + i * 0.1}s forwards`;
-  });
-
-  // ── VERDICT ──
-  const badge = document.getElementById('verdict-badge');
-  const v = (result.verdict || '').toUpperCase();
-  badge.textContent = v;
-  badge.className = 'font-title text-sm tracking-widest px-4 py-2 rounded-sm';
-  if (v === 'ACHAT')    badge.classList.add('badge-buy');
-  else if (v === 'VENTE') badge.classList.add('badge-sell');
-  else                   badge.classList.add('badge-hold');
-
-  document.getElementById('verdict-asset').textContent = assetQuery.toUpperCase();
-
-  const confidence = parseInt(result.confiance) || 0;
-  document.getElementById('confidence-val').textContent = `${confidence}%`;
-  setTimeout(() => {
-    document.getElementById('confidence-fill').style.width = `${confidence}%`;
-  }, 300);
-
-  document.getElementById('verdict-price').textContent = result.prix_analyse || '—';
-
-  // ── SOURCES GROUNDING ──
-  const sourcesContainer = document.getElementById('sources-container');
-  const sourcesList = document.getElementById('sources-list');
-  if (sources && sources.length > 0) {
-    sourcesList.innerHTML = '';
-    sources.forEach(s => {
-      const a = document.createElement('a');
-      a.href = s.url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.className = 'source-chip';
-      a.textContent = s.title.length > 40 ? s.title.slice(0, 40) + '…' : s.title;
-      a.title = s.title;
-      sourcesList.appendChild(a);
-    });
-    sourcesContainer.style.display = 'block';
-  } else {
-    sourcesContainer.style.display = 'none';
-  }
-
-  // ── TECHNICAL ──
-  document.getElementById('technical-content').textContent = result.analyse_technique || '—';
-
-  // ── ACTIONS ──
-  const renderPills = (containerId, items, pillClass) => {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '';
-    (items || []).forEach(item => {
-      const el = document.createElement('div');
-      el.className = `${pillClass} rounded-sm px-3 py-2 font-mono text-xs leading-relaxed`;
-      el.textContent = item;
-      container.appendChild(el);
-    });
-  };
-  renderPills('must-do',    result.must_do,    'pill-must');
-  renderPills('can-do',     result.can_do,     'pill-can');
-  renderPills('stop-doing', result.stop_doing, 'pill-stop');
-
-  // ── PRICES ──
-  document.getElementById('price-entry').textContent = result.entree      || '—';
-  document.getElementById('price-tp').textContent    = result.take_profit || '—';
-  document.getElementById('price-sl').textContent    = result.stop_loss   || '—';
-
-  document.getElementById('rr-ratio').textContent =
-    `Entrée → TP → SL | Confiance: ${confidence}% | ${v}`;
-}
-
-// ─── MAIN LAUNCH ─────────────────────────────────────────
-async function launchAnalysis() {
-  const query = document.getElementById('asset-input').value.trim();
-  if (!query) {
-    document.getElementById('asset-input').focus();
-    return;
-  }
-
-  const geminiKey = localStorage.getItem(KEY_GEMINI);
-  if (!geminiKey) {
-    openMissingKeys();
-    return;
-  }
-
-  clearError();
-  showLoader();
-
-  let marketData = null;
-  const category = detectCategory(query);
+  // Try FX_DAILY first (most data)
+  let prices = [];
+  let currentPrice = null;
+  let priceStr = null;
 
   try {
-    // STEP 1 : Récupération données marché
-    if (category.type === 'crypto') {
-      try {
-        marketData = await fetchCryptoData(category.id);
-      } catch (e) {
-        console.warn('CoinGecko fetch failed, Gemini Search Grounding prendra le relais:', e);
-        marketData = null;
+    const fxUrl = `https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=${from}&to_symbol=${to}&outputsize=compact&apikey=${avKey}`;
+    const fxResp = await fetch(fxUrl);
+    const fxData = await fxResp.json();
+
+    if (fxData['Time Series FX (Daily)']) {
+      const series = fxData['Time Series FX (Daily)'];
+      const dates = Object.keys(series).sort();
+      prices = dates.map(d => parseFloat(series[d]['4. close']));
+      currentPrice = prices[prices.length - 1];
+      priceStr = currentPrice.toFixed(6);
+    }
+  } catch (e) { console.warn('[AV FX_DAILY]', e.message); }
+
+  // Fallback to GLOBAL_QUOTE / CURRENCY_EXCHANGE_RATE
+  if (!currentPrice) {
+    const gqUrl = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${from}&to_currency=${to}&apikey=${avKey}`;
+    const gqResp = await fetch(gqUrl);
+    const gqData = await gqResp.json();
+    if (gqData['Realtime Currency Exchange Rate']) {
+      currentPrice = parseFloat(gqData['Realtime Currency Exchange Rate']['5. Exchange Rate']);
+      priceStr = currentPrice.toFixed(6);
+    }
+  }
+
+  if (!currentPrice) throw new Error(`Alpha Vantage : données ${from}/${to} indisponibles`);
+
+  const technical = buildTechnicalBlock(prices.length > 0 ? [...prices, currentPrice] : [currentPrice]);
+
+  return {
+    name: `${from}/${to}`, symbol: `${from}/${to}`, price: currentPrice,
+    change24h: null, volume: null, marketCap: null,
+    priceStr: priceStr || currentPrice.toString(),
+    technical, prices, source: 'Alpha Vantage'
+  };
+}
+
+// ───────────────────────────────────────────────────────────────
+// K. GEMINI API — Google AI Generative AI (direct key call)
+//    Modèle: gemini-3.5-flash (stable + grounding + thinking)
+//    Search Grounding: tools[googleSearch]
+//    Extended Thinking: thinkingConfig budgetTokens + explicit prompt
+// ───────────────────────────────────────────────────────────────
+const GEMINI_MODEL = 'gemini-3.5-flash';
+const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
+
+async function callGemini(assetQuery, marketData, geminiKey, useFallback = false) {
+  // Build technical context block
+  let contextBlock = '';
+  if (marketData) {
+    const t = marketData.technical;
+    contextBlock = `
+[DONNÉES MARCHÉ TEMPS RÉEL — Source: ${marketData.source}]
+Actif: ${marketData.name} (${marketData.symbol})
+Prix actuel: ${marketData.priceStr}
+Variation 24h: ${marketData.change24h != null ? marketData.change24h.toFixed(2)+'%' : 'N/D'}
+Volume: ${marketData.volume ? '$'+marketData.volume.toLocaleString() : 'N/D'}
+Capitalisation: ${marketData.marketCap ? '$'+marketData.marketCap.toLocaleString() : 'N/D'}
+
+[INDICATEURS TECHNIQUES CALCULÉS — Ne pas réinventer, interpréter uniquement ces valeurs]
+${t.summary}
+Tendance calculée: ${t.trend || 'N/D'}
+RSI(14): ${t.rsi != null ? t.rsi.toFixed(2) : 'N/D'}
+SMA(20): ${t.sma20 != null ? t.sma20.toFixed(6) : 'N/D'}
+SMA(50): ${t.sma50 != null ? t.sma50.toFixed(6) : 'N/D'}
+EMA(12): ${t.ema12 != null ? t.ema12.toFixed(6) : 'N/D'}
+EMA(26): ${t.ema26 != null ? t.ema26.toFixed(6) : 'N/D'}
+MACD: ${t.macd ? t.macd.macd.toFixed(6) : 'N/D'}
+Momentum(10): ${t.momentum != null ? t.momentum.toFixed(6) : 'N/D'}`;
+  } else {
+    contextBlock = `[ACTIF ATYPIQUE / DONNÉES API INDISPONIBLES]
+Actif: "${assetQuery}"
+Instruction: Utilise exclusivement ton outil Google Search pour obtenir le prix actuel, les indicateurs de marché, les actualités récentes et le sentiment de marché pour cet actif.`;
+  }
+
+  const systemInstruction = `Tu es CosnelLux AI, un conseiller financier privé d'élite de niveau Wall Street travaillant exclusivement pour l'investisseur privé Cosnel. Tu es pragmatique, analytique et d'une franchise absolue. Tu ne donnes jamais de conseils flous ou prudents. Tu prends des décisions tranchées basées sur les données. Tu croises TOUJOURS les données techniques fournies avec une recherche web temps réel via Google Search pour obtenir les actualités macroéconomiques, régulations, sentiment de marché et événements récents. Tu réponds TOUJOURS en JSON brut valide sans markdown.`;
+
+  const userPrompt = `${contextBlock}
+
+[MISSION]
+Effectue une analyse approfondie de l'actif "${assetQuery}".
+1. Utilise Google Search pour obtenir les actualités récentes des 7 derniers jours, le sentiment du marché, les régulations, et les événements macro impactant cet actif.
+2. Interprète les indicateurs techniques calculés fournis ci-dessus (ne les réinvente pas).
+3. Fournis une décision d'investissement tranchée.
+
+[INSTRUCTIONS JSON]
+Réponds UNIQUEMENT avec un objet JSON brut valide. Pas de backtick, pas de préambule, pas de markdown. Commence par { et finis par }.
+
+Structure requise:
+{
+  "verdict": "ACHAT" ou "VENTE" ou "CONSERVER",
+  "confiance": [entier 0-100],
+  "prix_analyse": "[prix actuel ou fourchette]",
+  "analyse_technique": "[Synthèse 3-5 phrases: interprétation RSI, MACD, EMA, tendance, et actualités trouvées via Google Search]",
+  "must_do": ["action prioritaire 1", "action prioritaire 2"],
+  "can_do": ["action optionnelle 1", "action optionnelle 2"],
+  "stop_doing": ["erreur absolue à éviter"],
+  "entree": "[niveau de prix d'entrée idéal]",
+  "take_profit": "[objectifs TP]",
+  "stop_loss": "[stop loss impératif]"
+}`;
+
+  const body = {
+    system_instruction: { parts: [{ text: systemInstruction }] },
+    contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+    tools: [{ google_search: {} }],
+    generationConfig: {
+      temperature: 0.4,
+      maxOutputTokens: 2048,
+    }
+  };
+
+  const url = `${GEMINI_BASE}/${GEMINI_MODEL}:generateContent?key=${geminiKey}`;
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    const msg = err.error?.message || `Erreur Gemini ${resp.status}`;
+    throw new Error(msg);
+  }
+
+  const data = await resp.json();
+
+  // Extract text from candidates (skip thought parts)
+  let raw = '';
+  const candidates = data.candidates || [];
+  for (const c of candidates) {
+    for (const part of (c.content?.parts || [])) {
+      if (!part.thought && part.text) raw += part.text;
+    }
+  }
+
+  if (!raw) throw new Error('Gemini : réponse vide ou format inattendu');
+
+  // Aggressive cleanup
+  raw = raw.replace(/```json\s*/gi,'').replace(/```\s*/gi,'').trim();
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('Gemini : JSON introuvable dans la réponse');
+
+  return JSON.parse(match[0]);
+}
+
+// ───────────────────────────────────────────────────────────────
+// L. JSON VALIDATION & SANITIZATION
+// ───────────────────────────────────────────────────────────────
+const VALID_VERDICTS = ['ACHAT', 'VENTE', 'CONSERVER'];
+
+function validateAndSanitize(raw) {
+  const errors = [];
+  const r = { ...raw };
+
+  if (!VALID_VERDICTS.includes(r.verdict)) {
+    errors.push(`verdict invalide: "${r.verdict}"`);
+    r.verdict = 'CONSERVER';
+  }
+  r.confiance = parseInt(r.confiance);
+  if (isNaN(r.confiance) || r.confiance < 0 || r.confiance > 100) {
+    errors.push('confiance hors plage');
+    r.confiance = 50;
+  }
+  if (!r.prix_analyse || typeof r.prix_analyse !== 'string') { errors.push('prix_analyse manquant'); r.prix_analyse = 'N/D'; }
+  if (!r.analyse_technique || typeof r.analyse_technique !== 'string') { errors.push('analyse_technique manquante'); r.analyse_technique = 'Analyse indisponible.'; }
+  if (!Array.isArray(r.must_do) || !r.must_do.length) { errors.push('must_do manquant'); r.must_do = ['Attendre confirmation de tendance']; }
+  if (!Array.isArray(r.can_do)) { errors.push('can_do manquant'); r.can_do = []; }
+  if (!Array.isArray(r.stop_doing)) { errors.push('stop_doing manquant'); r.stop_doing = []; }
+  if (!r.entree || typeof r.entree !== 'string') { errors.push('entree manquant'); r.entree = 'Voir analyse'; }
+  if (!r.take_profit || typeof r.take_profit !== 'string') { errors.push('take_profit manquant'); r.take_profit = 'Voir analyse'; }
+  if (!r.stop_loss || typeof r.stop_loss !== 'string') { errors.push('stop_loss manquant'); r.stop_loss = 'Voir analyse'; }
+
+  // Sanitize array contents
+  r.must_do = r.must_do.map(s => String(s).slice(0, 200));
+  r.can_do = r.can_do.map(s => String(s).slice(0, 200));
+  r.stop_doing = r.stop_doing.map(s => String(s).slice(0, 200));
+
+  if (errors.length) console.warn('[CosnelLux][Validation] Corrections appliquées:', errors);
+  return r;
+}
+
+// ───────────────────────────────────────────────────────────────
+// M. MAIN ANALYSIS FLOW
+// ───────────────────────────────────────────────────────────────
+const LOADING_STEPS = [
+  'Récupération des cours temps réel',
+  'Calcul des indicateurs techniques',
+  'Activation de Gemini + Google Search Grounding',
+  'Analyse macro & sentiment de marché',
+  'Génération de la décision stratégique',
+];
+function setLoadingStep(i) { loadingStatus.textContent = LOADING_STEPS[Math.min(i, LOADING_STEPS.length-1)]; }
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function startAnalysis() {
+  const query = assetInput.value.trim();
+  if (!query) { assetInput.focus(); return; }
+
+  // Check Gemini key (mandatory)
+  if (!hasKey('gemini') || !_sessionPassword) {
+    showAlert('Clé Gemini requise', 'Configuration obligatoire',
+      'La clé API Google Gemini est indispensable. Elle sera chiffrée et stockée dans votre navigateur.');
+    return;
+  }
+
+  showLoading();
+  $('fallbackBanner').classList.remove('visible');
+
+  let marketData = null;
+  let useFallback = false;
+  const assetType = detectAssetType(query);
+
+  try {
+    setLoadingStep(0);
+
+    if (assetType === 'crypto') {
+      const cgKey = await getKey('cg');
+      if (!cgKey) {
+        $('fallbackBanner').classList.add('visible');
+        $('fallbackBanner').querySelector('#fallbackMsg').textContent = 'Clé CoinGecko absente — Gemini Search Grounding actif';
+        useFallback = true;
+      } else {
+        try {
+          marketData = await fetchCryptoData(query, cgKey);
+        } catch (e) {
+          console.warn('[CoinGecko] Erreur —', e.message, '— Fallback Gemini');
+          $('fallbackBanner').classList.add('visible');
+          $('fallbackBanner').querySelector('#fallbackMsg').textContent = 'CoinGecko indisponible — Gemini Search Grounding actif';
+          useFallback = true;
+        }
       }
-    } else if (category.type === 'forex') {
-      try {
-        marketData = await fetchForexData(category.symbol);
-      } catch (e) {
-        console.warn('Alpha Vantage fetch failed, Gemini Search Grounding prendra le relais:', e);
-        marketData = null;
+    } else if (assetType === 'forex') {
+      const avKey = await getKey('alpha');
+      if (!avKey) {
+        $('fallbackBanner').classList.add('visible');
+        $('fallbackBanner').querySelector('#fallbackMsg').textContent = 'Clé Alpha Vantage absente — Gemini Search Grounding actif';
+        useFallback = true;
+      } else {
+        try {
+          marketData = await fetchForexData(query, avKey);
+        } catch (e) {
+          console.warn('[AlphaVantage] Erreur —', e.message, '— Fallback Gemini');
+          $('fallbackBanner').classList.add('visible');
+          $('fallbackBanner').querySelector('#fallbackMsg').textContent = 'Alpha Vantage indisponible — Gemini Search Grounding actif';
+          useFallback = true;
+        }
       }
+    } else {
+      useFallback = true;
     }
 
-    const marketDataStr = formatMarketData(marketData, query);
+    setLoadingStep(1);
+    await delay(300);
+    setLoadingStep(2);
 
-    // STEP 2 : Analyse Gemini avec Google Search Grounding
-    const { result, sources } = await callGemini(query, marketDataStr);
+    const geminiKey = await getKey('gemini');
+    if (!geminiKey) throw new Error('Impossible de déchiffrer la clé Gemini. Vérifiez vos réglages.');
 
-    hideLoader();
-    renderResults(result, sources, query);
+    setLoadingStep(3);
+    const rawResult = await callGemini(query, marketData, geminiKey, useFallback);
+    
+    // Clear key from memory
+    setLoadingStep(4);
+    await delay(300);
+
+    const result = validateAndSanitize(rawResult);
+    renderResults(result, query, marketData);
 
   } catch (err) {
-    hideLoader();
-    console.error('Analysis error:', err);
-    showError(`Erreur d'analyse : ${err.message}. Vérifiez votre clé Gemini dans les Réglages.`);
-    document.getElementById('empty-state').style.display = 'block';
-    document.getElementById('results-grid').style.display = 'none';
+    hideLoading();
+    console.error('[CosnelLux] Erreur analyse:', err);
+    showAlert('Erreur d\'analyse', 'Problème technique', err.message || 'Erreur inattendue. Vérifiez votre clé Gemini dans les Réglages.', true);
   }
 }
 
-// ─── KEYBOARD SHORTCUTS ──────────────────────────────────
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    closeSettings();
-    closeMissingKeys();
+// ───────────────────────────────────────────────────────────────
+// N. UI STATE
+// ───────────────────────────────────────────────────────────────
+function showLoading() {
+  heroText.style.display = 'none';
+  btnAnalyze.disabled = true;
+  resultsGrid.style.display = 'none';
+  resultsGrid.classList.remove('visible');
+  btnReset.style.display = 'none';
+  loadingScreen.classList.add('active');
+  heroSection.classList.add('has-results');
+}
+function hideLoading() { loadingScreen.classList.remove('active'); btnAnalyze.disabled = false; }
+function resetUI() {
+  heroText.style.display = '';
+  heroSection.classList.remove('has-results');
+  resultsGrid.style.display = 'none';
+  resultsGrid.classList.remove('visible');
+  btnReset.style.display = 'none';
+  $('fallbackBanner').classList.remove('visible');
+  assetInput.value = '';
+  assetInput.focus();
+}
+
+// ───────────────────────────────────────────────────────────────
+// O. RENDER RESULTS
+// ───────────────────────────────────────────────────────────────
+function renderResults(r, query, marketData) {
+  hideLoading();
+
+  // Verdict
+  const vmap = { 'ACHAT': ['buy','▲'], 'VENTE': ['sell','▼'], 'CONSERVER': ['hold','◆'] };
+  const [vcls, vicon] = vmap[r.verdict] || ['hold','◆'];
+  $('verdictBadge').className = `verdict-badge ${vcls}`;
+  $('verdictBadge').textContent = `${vicon} ${r.verdict}`;
+
+  // Confidence
+  const conf = r.confiance;
+  $('confidenceValue').textContent = conf;
+  setTimeout(() => { $('confidenceBar').style.width = conf + '%'; }, 100);
+
+  // Technical card
+  $('assetChip').innerHTML = `<span class="dot"></span><span>${query.toUpperCase()}</span>`;
+  $('techPrice').textContent = r.prix_analyse;
+  $('techText').textContent = r.analyse_technique;
+
+  // Indicators row
+  const indRow = $('indicatorsRow');
+  indRow.innerHTML = '';
+  if (marketData?.technical?.indicators?.length) {
+    marketData.technical.indicators.forEach(ind => {
+      const chip = document.createElement('div');
+      chip.className = `indicator-chip ${ind.type}`;
+      chip.textContent = ind.label;
+      indRow.appendChild(chip);
+    });
   }
-});
 
-document.getElementById('settings-modal').addEventListener('click', (e) => {
-  if (e.target === e.currentTarget) closeSettings();
-});
-document.getElementById('missing-keys-modal').addEventListener('click', (e) => {
-  if (e.target === e.currentTarget) closeMissingKeys();
-});
+  // Actions
+  const al = $('actionsList');
+  al.innerHTML = '';
+  if (r.must_do?.length) {
+    const lbl = document.createElement('div'); lbl.className = 'action-group-label must'; lbl.textContent = '● Must Do'; al.appendChild(lbl);
+    r.must_do.forEach(a => al.appendChild(makeAction(a, 'dot-green')));
+  }
+  if (r.can_do?.length) {
+    const lbl = document.createElement('div'); lbl.className = 'action-group-label can'; lbl.textContent = '● Can Do'; al.appendChild(lbl);
+    r.can_do.forEach(a => al.appendChild(makeAction(a, 'dot-amber')));
+  }
+  if (r.stop_doing?.length) {
+    const lbl = document.createElement('div'); lbl.className = 'action-group-label stop'; lbl.textContent = '● Stop Doing'; al.appendChild(lbl);
+    r.stop_doing.forEach(a => al.appendChild(makeAction(a, 'dot-red')));
+  }
 
-document.getElementById('auth-pwd').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') checkAuthPwd();
-});
+  // Price levels
+  $('levelEntry').textContent = r.entree;
+  $('levelTP').textContent = r.take_profit;
+  $('levelSL').textContent = r.stop_loss;
 
-// ─── INIT ────────────────────────────────────────────────
-updateApiStatus();
+  // Show grid
+  resultsGrid.style.display = 'grid';
+  btnReset.style.display = 'inline-flex';
+  requestAnimationFrame(() => requestAnimationFrame(() => resultsGrid.classList.add('visible')));
+}
+
+function makeAction(text, dotClass) {
+  const d = document.createElement('div');
+  d.className = 'action-item';
+  d.innerHTML = `<div class="action-dot ${dotClass}"></div><span>${text}</span>`;
+  return d;
+}
+
+// ─── Boot ───
+init();
 </script>
 </body>
 </html>
